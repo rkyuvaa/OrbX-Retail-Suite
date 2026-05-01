@@ -103,6 +103,11 @@ router.post('/setup', async (req, res) => {
                 status VARCHAR(20) DEFAULT 'SUCCESS',
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+            CREATE TABLE IF NOT EXISTS departments (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) UNIQUE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
         `);
 
         // Step 1b: Patch missing columns on existing tables (safe migrations)
@@ -118,6 +123,7 @@ router.post('/setup', async (req, res) => {
             ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_branches JSONB DEFAULT '[]';
             ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_modules JSONB DEFAULT '[]';
             ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superadmin BOOLEAN DEFAULT FALSE;
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS department_id INTEGER;
         `);
 
         // Step 2: (Optional) Check count for logging
