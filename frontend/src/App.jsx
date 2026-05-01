@@ -8,7 +8,8 @@ import { startSyncEngine, fetchUpdates } from './utils/db';
 
 // Mock Branch ID for testing
 const BRANCH_ID = 1;
-const API_URL = 'http://localhost:5000';
+// Dynamically set API URL based on current host
+const API_URL = `http://${window.location.hostname}:5000`;
 
 function Dashboard() {
   return (
