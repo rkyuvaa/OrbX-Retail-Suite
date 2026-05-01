@@ -491,14 +491,16 @@ function BranchesTab({ onUpdate }) {
     const columns = [
         { key: 'name', label: 'Branch Name', bold: true },
         { key: 'location', label: 'Location' },
-        { key: 'is_warehouse', label: 'Warehouse', render: r => r.is_warehouse ? <span style={{ color: 'var(--primary)', fontWeight: 800 }}>Yes</span> : 'No' },
+        { key: 'address', label: 'Address' },
+        { key: 'is_warehouse', label: 'Type', render: r => <Badge color="var(--primary-light)">{r.is_warehouse ? 'Warehouse' : 'Retail Store'}</Badge> },
+        { key: 'is_active', label: 'Status', render: r => <Badge color={r.is_active ? 'var(--success)' : 'var(--danger)'}>{r.is_active ? 'Active' : 'Inactive'}</Badge> },
     ];
 
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.25rem' }}>Branch Management</h4>
-                <button className="btn btn-primary" onClick={() => { setForm({ is_warehouse: false }); setModal('add'); }}>+ Add Branch</button>
+                <button className="btn btn-primary" onClick={() => { setForm({ is_warehouse: false, is_active: true }); setModal('add'); }}>+ Add Branch</button>
             </div>
             <DataTable columns={columns} rows={items} onEdit={row => { setForm(row); setModal({ edit: row }); }} onDelete={remove} />
             {modal && (
@@ -510,14 +512,25 @@ function BranchesTab({ onUpdate }) {
                         <button className="btn btn-primary" onClick={save}>Save Branch</button>
                     </>}
                 >
-                    <div className="form-group"><label className="form-label">Branch Name</label><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter branch name" /></div>
+                    <div className="form-group"><label className="form-label">Branch Name *</label><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter branch name" /></div>
                     <div className="form-group"><label className="form-label">Location</label><input className="input" value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="City or area" /></div>
-                    <div className="form-group">
-                        <label className="form-label">Is Warehouse?</label>
-                        <select className="input" value={form.is_warehouse ? 'true' : 'false'} onChange={e => setForm({ ...form, is_warehouse: e.target.value === 'true' })}>
-                            <option value="false">No (Retail Branch)</option>
-                            <option value="true">Yes (Storage/Warehouse)</option>
-                        </select>
+                    <div className="form-group"><label className="form-label">Detailed Address</label><textarea className="input" style={{ height: '80px', padding: '12px' }} value={form.address || ''} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Full postal address" /></div>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="form-group">
+                            <label className="form-label">Branch Type</label>
+                            <select className="input" value={form.is_warehouse ? 'true' : 'false'} onChange={e => setForm({ ...form, is_warehouse: e.target.value === 'true' })}>
+                                <option value="false">Retail Store</option>
+                                <option value="true">Warehouse</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Operational Status</label>
+                            <select className="input" value={form.is_active ? 'true' : 'false'} onChange={e => setForm({ ...form, is_active: e.target.value === 'true' })}>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
                     </div>
                 </Modal>
             )}
