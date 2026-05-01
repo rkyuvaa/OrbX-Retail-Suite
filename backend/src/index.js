@@ -15,6 +15,7 @@ const branchesRoutes = require('./routes/branches');
 const rolesRoutes = require('./routes/roles');
 const departmentsRoutes = require('./routes/departments');
 const salespersonsRoutes = require('./routes/salespersons');
+const inventoryRoutes = require('./routes/inventory');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,6 +37,7 @@ app.use('/api/branches', branchesRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/departments', departmentsRoutes);
 app.use('/api/salespersons', salespersonsRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 app.get('/', (req, res) => {
     res.send('Orbx Retail ERP API is running...');
