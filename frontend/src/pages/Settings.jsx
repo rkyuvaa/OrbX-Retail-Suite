@@ -391,12 +391,113 @@ function DepartmentsTab() {
     );
 }
 
+// ─── SALES PERSONS TAB ───────────────────────────────────────────────────────
+function SalesPersonsTab({ branches }) {
+    const [items, setItems] = useState([]);
+    const [modal, setModal] = useState(null);
+    const [form, setForm] = useState({});
+
+    const load = async () => {
+        const r = await apiFetch('/api/salespersons');
+        if (r.ok) setItems(await r.json());
+    };
+    useEffect(() => { load(); }, []);
+
+    const save = async () => {
+        const isEdit = modal?.edit;
+        const r = await apiFetch(isEdit ? `/api/salespersons/${modal.edit.id}` : '/api/salespersons', {
+            method: isEdit ? 'PUT' : 'POST',
+            body: JSON.stringify(form)
+        });
+        if (r.ok) { toast.success(isEdit ? 'Updated' : 'Salesperson added'); setModal(null); load(); }
+        else { const d = await r.json(); toast.error(d.error || 'Failed'); }
+    };
+
+    const remove = async (row) => {
+        if (!confirm(`Delete salesperson "${row.name}"?`)) return;
+        const r = await apiFetch(`/api/salespersons/${row.id}`, { method: 'DELETE' });
+        if (r.ok) { toast.success('Deleted'); load(); } else toast.error('Delete failed');
+    };
+
+    const columns = [
+        { key: 'name', label: 'Name', bold: true },
+        { key: 'email', label: 'Email' },
+        { key: 'phone', label: 'Phone' },
+        { key: 'branch_name', label: 'Branch', render: r => r.branch_name || '—' },
+        { key: 'commission_percent', label: 'Commission', render: r => `${r.commission_percent || 0}%` },
+        { key: 'target_amount', label: 'Target', render: r => `₹${Number(r.target_amount || 0).toLocaleString()}` },
+        { key: 'is_active', label: 'Status', render: r => (
+            <span style={{ color: r.is_active ? 'var(--success)' : 'var(--danger)', fontWeight: 700 }}>
+                {r.is_active ? 'Active' : 'Inactive'}
+            </span>
+        )},
+    ];
+
+    return (
+        <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.25rem' }}>Sales Person Management</h4>
+                <button className="btn btn-primary" onClick={() => { setForm({ is_active: true, commission_percent: 0, target_amount: 0 }); setModal('add'); }}>+ Add Sales Person</button>
+            </div>
+            <DataTable columns={columns} rows={items} onEdit={row => { setForm(row); setModal({ edit: row }); }} onDelete={remove} />
+
+            {modal && (
+                <Modal
+                    title={modal === 'add' ? 'Add Sales Person' : 'Edit Sales Person'}
+                    onClose={() => setModal(null)}
+                    footer={<>
+                        <button className="btn btn-ghost" onClick={() => setModal(null)}>Cancel</button>
+                        <button className="btn btn-primary" onClick={save}>Save</button>
+                    </>}
+                >
+                    <FormField label="Full Name">
+                        <input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter full name" />
+                    </FormField>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <FormField label="Email">
+                            <input className="input" type="email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
+                        </FormField>
+                        <FormField label="Phone / Mobile">
+                            <input className="input" value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 9876543210" />
+                        </FormField>
+                    </div>
+                    <FormField label="Assigned Branch">
+                        <select className="input" value={form.branch_id || ''} onChange={e => setForm({ ...form, branch_id: e.target.value || null })}>
+                            <option value="">Select Branch</option>
+                            {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                        </select>
+                    </FormField>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <FormField label="Commission %">
+                            <input className="input" type="number" min="0" max="100" step="0.5"
+                                value={form.commission_percent || 0} onChange={e => setForm({ ...form, commission_percent: e.target.value })} />
+                        </FormField>
+                        <FormField label="Monthly Target (₹)">
+                            <input className="input" type="number" min="0"
+                                value={form.target_amount || 0} onChange={e => setForm({ ...form, target_amount: e.target.value })} />
+                        </FormField>
+                    </div>
+                    {modal?.edit && (
+                        <FormField label="Status">
+                            <select className="input" value={form.is_active ? 'true' : 'false'} onChange={e => setForm({ ...form, is_active: e.target.value === 'true' })}>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </FormField>
+                    )}
+                </Modal>
+            )}
+        </>
+    );
+}
+
 // ─── MAIN SETTINGS PAGE ───────────────────────────────────────────────────────
 const TABS = [
-    { key: 'users', label: '👤 Users' },
-    { key: 'branches', label: '🏢 Branches' },
-    { key: 'roles', label: '🛡 Roles' },
-    { key: 'departments', label: '🏷 Departments' },
+    { key: 'users',        label: '👤 Users' },
+    { key: 'salespersons', label: '🧑‍💼 Sales Persons' },
+    { key: 'branches',     label: '🏢 Branches' },
+    { key: 'roles',        label: '🛡 Roles' },
+    { key: 'departments',  label: '🏷 Departments' },
 ];
 
 export default function Settings() {
@@ -434,10 +535,11 @@ export default function Settings() {
 
             {/* Tab Content */}
             <div className="card" style={{ padding: 20 }}>
-                {activeTab === 'users'       && <UsersTab roles={roles} branches={branches} departments={departments} />}
-                {activeTab === 'branches'    && <BranchesTab />}
-                {activeTab === 'roles'       && <RolesTab />}
-                {activeTab === 'departments' && <DepartmentsTab />}
+                {activeTab === 'users'        && <UsersTab roles={roles} branches={branches} departments={departments} />}
+                {activeTab === 'salespersons' && <SalesPersonsTab branches={branches} />}
+                {activeTab === 'branches'     && <BranchesTab />}
+                {activeTab === 'roles'        && <RolesTab />}
+                {activeTab === 'departments'  && <DepartmentsTab />}
             </div>
         </div>
     );
