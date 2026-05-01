@@ -162,68 +162,44 @@ export default function POS() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5 h-[calc(100vh-200px)]">
-
-        {/* ── LEFT: Item Selection ───────────────────────── */}
-        <div className="flex flex-col gap-4 overflow-hidden">
-
-          {/* Search Bar */}
+      <div className="flex justify-center h-[calc(100vh-200px)]">
+        {/* ── MAIN: Bill Panel ──────────────────────────── */}
+        <div className="flex flex-col gap-4 overflow-hidden w-full max-w-2xl">
+          
+          {/* Item Search / Barcode Entry */}
           <div className="relative">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
             <input
               ref={searchRef}
-              className="input pl-10 pr-24 py-3.5 text-sm font-bold w-full"
-              placeholder="Search by name, code, or category... (F1)"
+              className="input pl-10 pr-24 py-4 text-lg font-black w-full shadow-lg border-primary/20 focus:border-primary"
+              placeholder="Scan Barcode or Search Item... (F1)"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted bg-gray-100 px-2 py-1 rounded-lg">
-              {filtered.length} items
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted bg-gray-100 px-3 py-1.5 rounded-xl">
+              Ready to Scan
             </span>
-          </div>
 
-          {/* Items Grid */}
-          <div className="overflow-y-auto flex-1 pr-1" style={{ scrollbarWidth: 'thin' }}>
-            <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
-              {filtered.map((item, idx) => (
-                <button
-                  key={item.id}
-                  onClick={() => addToCart(item)}
-                  className={`text-left p-4 rounded-2xl border-2 transition-all hover:shadow-lg hover:-translate-y-0.5 group ${
-                    selectedItemIdx === idx 
-                      ? 'border-primary bg-primary/[0.04] shadow-lg shadow-primary/10' 
-                      : 'border-border bg-white hover:border-primary/50'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="text-[9px] font-black uppercase tracking-widest text-muted bg-gray-100 px-2 py-0.5 rounded-full">{item.category}</span>
-                    <span className={`text-[9px] font-black ${item.stock < 50 ? 'text-danger' : 'text-success'}`}>{item.stock} left</span>
-                  </div>
-                  <p className="text-sm font-black leading-tight mb-1 line-clamp-2">{item.name}</p>
-                  <p className="text-[10px] text-muted font-bold font-mono mb-3">{item.code}</p>
-                  <div className="flex items-end justify-between">
+            {/* Floating Search Results Dropdown */}
+            {search && filtered.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl border border-border shadow-2xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                {filtered.map((item, idx) => (
+                  <div key={item.id} 
+                    className={`p-4 flex items-center justify-between cursor-pointer border-b border-border last:border-0 hover:bg-gray-50 ${selectedItemIdx === idx ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
+                    onClick={() => { addToCart(item); setSearch(''); }}>
                     <div>
-                      <p className="text-lg font-black text-primary">₹{item.price.toLocaleString()}</p>
-                      <p className="text-[9px] text-muted font-bold">{item.unit}</p>
+                      <p className="text-sm font-black">{item.name}</p>
+                      <p className="text-[10px] text-muted font-bold font-mono">{item.code} • {item.category}</p>
                     </div>
-                    <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                      <Plus size={16} />
+                    <div className="text-right">
+                      <p className="text-sm font-black text-primary">₹{item.price.toLocaleString()}</p>
+                      <p className="text-[10px] text-success font-black">{item.stock} in stock</p>
                     </div>
                   </div>
-                </button>
-              ))}
-              {filtered.length === 0 && (
-                <div className="col-span-full py-20 text-center text-muted">
-                  <ShoppingBag size={40} className="mx-auto mb-3 opacity-30" />
-                  <p className="font-black text-sm">No items found</p>
-                </div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-
-        {/* ── RIGHT: Bill Panel ──────────────────────────── */}
-        <div className="flex flex-col gap-4 overflow-hidden">
 
           {/* Customer Info */}
           <div className="bg-white rounded-2xl border border-border p-4 flex flex-col gap-3">
