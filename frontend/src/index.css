@@ -281,6 +281,24 @@ h1, h2, h3, h4, h5, .font-heading, button, input, select, textarea {
 .animate-slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-pulse    { animation: pulse   2s cubic-bezier(0.4, 0, 0.6, 1) infinite;    }
 
+@keyframes spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 /* ========== Premium Glass / Backdrop ========== */
 .backdrop-blur-sm { backdrop-filter: blur(4px);  }
 .backdrop-blur-md { backdrop-filter: blur(12px); }
@@ -450,6 +468,20 @@ body:has(.sidebar.collapsed) .modal-overlay {
 .btn-ghost:hover {
   background: var(--primary-light);
   color:      var(--primary);
+}
+
+/* Form */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+.form-label {
+  display:        block;
+  font-size:      11px;
+  font-weight:    800;
+  color:          var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom:  0.6rem;
+  letter-spacing: 0.05em;
 }
 
 /* Input */

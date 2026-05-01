@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { 
+  Plus, Pencil, Trash2, Shield, Building, Boxes, 
+  Users as UsersIcon, X, CheckSquare, Square, 
+  Clock, History, Search, Filter 
+} from 'lucide-react';
+import { Modal, Confirm, Badge, Loader, Empty } from '../components/Shared';
 
 const API_URL = `http://${window.location.hostname}:5000`;
 
@@ -15,53 +21,9 @@ function apiFetch(path, options = {}) {
     });
 }
 
-// ─── Shared Modal ────────────────────────────────────────────────────────────
-function Modal({ title, onClose, children, footer }) {
-    return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <div className="modal-header">
-                    <h3>{title}</h3>
-                    <button onClick={onClose} style={{ 
-                        background: 'var(--primary-light)', color: 'var(--primary)', 
-                        border: 'none', width: '40px', height: '40px', borderRadius: '12px',
-                        cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold'
-                    }}>✕</button>
-                </div>
-                <div className="modal-body">
-                    {children}
-                </div>
-                {footer && (
-                    <div className="modal-footer">
-                        {footer}
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-}
 
-function FormField({ label, children }) {
-    return (
-        <div style={{ marginBottom: '1rem' }}>
-            <label style={{ 
-                display: 'block', 
-                fontSize: '11px', 
-                fontWeight: 800, 
-                color: 'var(--text-muted)', 
-                marginBottom: '0.6rem', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.05em' 
-            }}>{label}</label>
-            {children}
-        </div>
-    );
-}
 
-const inputStyle = {}; // Not used, replaced by className="input"
 
-const btnPrimaryClass = "btn btn-primary";
-const btnGhostClass = "btn btn-ghost";
 
 // ─── Table Wrapper ────────────────────────────────────────────────────────────
 function DataTable({ columns, rows, onEdit, onDelete }) {
@@ -109,113 +71,382 @@ function DataTable({ columns, rows, onEdit, onDelete }) {
     );
 }
 
+const emptyForm = { 
+  name: '', email: '', password: '', role_id: '', 
+  branch_id: '', allowed_branches: [], allowed_modules: {}, 
+  department_id: '', is_superadmin: false, is_active: true 
+};
+
+const ALL_MODULES = [
+  { key: 'crm', name: 'CRM' },
+  { key: 'inventory', name: 'Inventory' },
+  { key: 'pos', name: 'POS / Billing' },
+  { key: 'transfers', name: 'Stock Transfers' },
+  { key: 'reports', name: 'Reports' },
+  { key: 'settings', name: 'System Settings' }
+];
+
 // ─── USERS TAB ────────────────────────────────────────────────────────────────
 function UsersTab({ roles, branches, departments }) {
     const [users, setUsers] = useState([]);
-    const [modal, setModal] = useState(null); // null | 'add' | {edit: row}
-    const [form, setForm] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [mode, setMode] = useState('list'); // 'list' or 'form'
+    
+    // User Form
+    const [editing, setEditing] = useState(null);
+    const [form, setForm] = useState(emptyForm);
+    const [saving, setSaving] = useState(false);
+    const [history, setHistory] = useState([]);
+    const [confirming, setConfirming] = useState(null);
 
-    const load = async () => {
-        const r = await apiFetch('/api/users');
-        if (r.ok) setUsers(await r.json());
+    const load = useCallback(async () => {
+        setLoading(true);
+        try {
+            const r = await apiFetch('/api/users');
+            if (r.ok) setUsers(await r.json());
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { load(); }, [load]);
+
+    const loadHistory = async (uid) => {
+        // Audit log placeholder — can be implemented later in backend
+        setHistory([]);
     };
-    useEffect(() => { load(); }, []);
 
-    const openAdd = () => { setForm({ is_superadmin: false, is_active: true }); setModal('add'); };
-    const openEdit = (row) => { setForm({ ...row, password: '' }); setModal({ edit: row }); };
+    const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-    const save = async () => {
-        const isEdit = modal?.edit;
-        const url = isEdit ? `/api/users/${modal.edit.id}` : '/api/users';
-        const method = isEdit ? 'PUT' : 'POST';
-        const body = { ...form };
-        if (isEdit && !body.password) delete body.password;
+    const openAdd = () => { 
+        setForm(emptyForm); 
+        setEditing(null); 
+        setHistory([]);
+        setMode('form'); 
+    };
 
-        const r = await apiFetch(url, { method, body: JSON.stringify(body) });
-        if (r.ok) {
-            toast.success(isEdit ? 'User updated' : 'User created');
-            setModal(null); load();
-        } else {
-            const d = await r.json();
-            toast.error(d.error || 'Failed');
+    const openEdit = u => {
+        setForm({ 
+            name: u.name, 
+            email: u.email, 
+            password: '', 
+            role_id: u.role_id || '', 
+            branch_id: u.branch_id || '', 
+            allowed_branches: u.allowed_branches || [], 
+            allowed_modules: u.allowed_modules || {}, 
+            department_id: u.department_id || '',
+            is_superadmin: !!u.is_superadmin, 
+            is_active: !!u.is_active 
+        });
+        setEditing(u.id); 
+        loadHistory(u.id);
+        setMode('form');
+    };
+
+    const saveUser = async (e) => {
+        if (e) e.preventDefault();
+        if (!form.name || !form.email) return toast.error('Name and Email are required');
+        setSaving(true);
+        try {
+            const isEdit = !!editing;
+            const url = isEdit ? `/api/users/${editing}` : '/api/users';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const r = await apiFetch(url, { method, body: JSON.stringify(form) });
+            if (r.ok) {
+                toast.success(isEdit ? 'User updated' : 'User created');
+                setMode('list'); load();
+            } else {
+                const d = await r.json();
+                toast.error(d.error || 'Failed to save');
+            }
+        } finally {
+            setSaving(false);
         }
     };
 
-    const remove = async (row) => {
-        if (!confirm(`Delete user "${row.name}"?`)) return;
-        const r = await apiFetch(`/api/users/${row.id}`, { method: 'DELETE' });
-        if (r.ok) { toast.success('Deleted'); load(); }
-        else toast.error('Delete failed');
+    const remove = async () => {
+        if (!confirming) return;
+        try {
+            const r = await apiFetch(`/api/users/${confirming.id}`, { method: 'DELETE' });
+            if (r.ok) { toast.success('User deleted'); setConfirming(null); load(); }
+        } catch (e) { toast.error('Error deleting'); }
     };
 
+    const toggleBranch = (bid) => {
+        const current = form.allowed_branches || [];
+        if (current.includes(bid)) set('allowed_branches', current.filter(id => id !== bid));
+        else set('allowed_branches', [...current, bid]);
+    };
+
+    const setModuleRole = (modKey, roleId) => {
+        setForm(f => {
+            const updated = { ...f.allowed_modules };
+            if (!roleId) delete updated[modKey];
+            else updated[modKey] = parseInt(roleId);
+            return { ...f, allowed_modules: updated };
+        });
+    };
+
+    if (loading && users.length === 0) return <Loader />;
+
+    if (mode === 'form') {
+        return (
+            <div className="animate-fade-in">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <div className="flex items-center gap-3">
+                        <button className="btn btn-ghost" onClick={() => setMode('list')} style={{ padding: '0.5rem' }}>
+                            <X size={20} />
+                        </button>
+                        <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.25rem' }}>
+                            {editing ? 'Edit User Profile' : 'Create New User'}
+                        </h4>
+                    </div>
+                    <button className="btn btn-primary" onClick={saveUser} disabled={saving}>
+                        {saving ? 'Saving...' : 'Save User Settings'}
+                    </button>
+                </div>
+
+                <div style={{ display: 'flex', gap: '24px' }}>
+                    {/* MAIN EDITOR AREA */}
+                    <div className="card" style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        
+                        {/* SECTION 1: Identity */}
+                        <section>
+                            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '8px', marginBottom: '16px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 900, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>1. Identity & Core Settings</span>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                                <div className="form-group">
+                                    <label style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Full Name</label>
+                                    <input className="input" value={form.name} onChange={e => set('name', e.target.value)} placeholder="Full Name" />
+                                </div>
+                                <div className="form-group">
+                                    <label style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Email Address</label>
+                                    <input className="input" type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="email@example.com" />
+                                </div>
+                                <div className="form-group">
+                                    <label style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Password</label>
+                                    <input className="input" type="password" value={form.password} onChange={e => set('password', e.target.value)} placeholder={editing ? '••••••••' : 'Password'} />
+                                </div>
+                                <div className="form-group">
+                                    <label style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Department</label>
+                                    <select className="input" value={form.department_id} onChange={e => set('department_id', e.target.value)}>
+                                        <option value="">Select Department</option>
+                                        {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Global Role</label>
+                                    <select className="input" value={form.role_id} onChange={e => set('role_id', e.target.value)}>
+                                        <option value="">Default Access</option>
+                                        {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Account Status</label>
+                                    <select className="input" value={form.is_active} onChange={e => set('is_active', e.target.value === 'true')}>
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</option>
+                                    </select>
+                                </div>
+                                <div className="form-group" style={{ gridColumn: 'span 3' }}>
+                                    <label className="flex items-center gap-3 cursor-pointer p-4 bg-primary/5 rounded-xl border border-primary/20">
+                                        <input type="checkbox" className="w-5 h-5 rounded" checked={form.is_superadmin} onChange={e => set('is_superadmin', e.target.checked)} />
+                                        <div>
+                                            <span style={{ fontWeight: 900, color: 'var(--primary)', fontSize: '12px', display: 'block' }}>GRANT SUPER ADMIN PRIVILEGES</span>
+                                            <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>Full system access, overriding all other module and branch restrictions.</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* SECTION 2: Branches */}
+                        <section>
+                            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '8px', marginBottom: '16px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 900, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>2. Branch Portfolio Authorization</span>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '10px' }}>
+                                {branches.map(b => {
+                                    const isPrimary = form.branch_id == b.id;
+                                    const isAllowed = (form.allowed_branches || []).includes(b.id);
+                                    const isSelected = isPrimary || isAllowed;
+                                    
+                                    return (
+                                        <div key={b.id} style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            gap: 12, 
+                                            padding: '10px 14px', 
+                                            background: isSelected ? 'var(--bg-main)' : 'transparent', 
+                                            border: `1.5px solid ${isPrimary ? 'var(--primary)' : (isSelected ? 'var(--primary-glow)' : 'var(--border)')}`, 
+                                            borderRadius: 12, 
+                                            transition: 'all 0.2s',
+                                            cursor: 'pointer'
+                                        }} onClick={() => toggleBranch(b.id)}>
+                                            <div style={{ width: 32, height: 32, borderRadius: 8, background: isSelected ? 'var(--primary-light)' : 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <Building size={18} color={isSelected ? 'var(--primary)' : 'var(--text-muted)'} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <span style={{ fontSize: '12px', fontWeight: 800, color: isSelected ? 'var(--text-main)' : 'var(--text-muted)', display: 'block' }}>{b.name}</span>
+                                                {isSelected && !isPrimary ? (
+                                                    <span 
+                                                        onClick={(e) => { e.stopPropagation(); set('branch_id', b.id); }} 
+                                                        style={{ fontSize: '8px', color: 'var(--primary)', fontWeight: 900, textTransform: 'uppercase', textDecoration: 'underline' }}
+                                                    >
+                                                        Set as Primary
+                                                    </span>
+                                                ) : (
+                                                    <span style={{ fontSize: '8px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{isPrimary ? 'Primary Branch' : (isSelected ? 'Authorized' : 'Locked')}</span>
+                                                )}
+                                            </div>
+                                            {isSelected ? <CheckSquare size={18} color="var(--primary)" /> : <Square size={18} color="var(--border)" />}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </section>
+
+                        {/* SECTION 3: Modules */}
+                        <section>
+                            <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '8px', marginBottom: '16px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 900, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '1px' }}>3. Module-Specific Roles</span>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                                {ALL_MODULES.map(m => {
+                                    const roleId = (form.allowed_modules || {})[m.key];
+                                    return (
+                                        <div key={m.key} style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center',
+                                            gap: 12,
+                                            padding: '12px', 
+                                            background: roleId ? 'var(--bg-main)' : 'transparent', 
+                                            border: `1.5px solid ${roleId ? 'var(--primary)' : 'var(--border)'}`, 
+                                            borderRadius: 14
+                                        }}>
+                                            <div style={{ 
+                                                width: 36, 
+                                                height: 36, 
+                                                background: roleId ? 'var(--primary)' : 'var(--bg-main)', 
+                                                borderRadius: 10, 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                justifyContent: 'center', 
+                                                color: roleId ? 'white' : 'var(--text-muted)' 
+                                            }}>
+                                                <Shield size={20} />
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <span style={{ fontSize: '11px', fontWeight: 900, color: roleId ? 'var(--text-main)' : 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>{m.name}</span>
+                                                <select 
+                                                    className="input" 
+                                                    value={roleId || ''} 
+                                                    onChange={e => setModuleRole(m.key, e.target.value)} 
+                                                    style={{ height: '32px', padding: '0 8px', fontSize: '11px', fontWeight: 700 }}
+                                                >
+                                                    <option value="">No Access</option>
+                                                    {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* SIDEBAR: Stats & History */}
+                    <div style={{ width: 300, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div className="card" style={{ padding: '20px' }}>
+                            <div className="flex items-center gap-2 mb-4">
+                                <Clock size={16} color="var(--primary)" />
+                                <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>Lifecycle</span>
+                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-xs text-muted block">Created At</label>
+                                    <span className="font-bold text-sm">{editing ? '01 May 2026' : 'Now'}</span>
+                                </div>
+                                <div>
+                                    <label className="text-xs text-muted block">Account Status</label>
+                                    <Badge color={form.is_active ? 'var(--success)' : 'var(--danger)'}>
+                                        {form.is_active ? 'ACTIVE' : 'INACTIVE'}
+                                    </Badge>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="card" style={{ flex: 1, padding: '20px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                            <div className="flex items-center gap-2 mb-4">
+                                <History size={16} color="var(--primary)" />
+                                <span style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase' }}>Rights Audit Log</span>
+                            </div>
+                            <div className="flex-1 overflow-y-auto">
+                                <Empty message="No rights changes yet" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const columns = [
-        { key: 'name', label: 'Name', bold: true },
-        { key: 'email', label: 'Email' },
-        { key: 'role_name', label: 'Role', render: r => r.role_name || '—' },
-        { key: 'branch_name', label: 'Branch', render: r => r.branch_name || '—' },
-        { key: 'is_superadmin', label: 'Admin', render: r => r.is_superadmin ? <span style={{ color: 'var(--primary)', fontWeight: 800 }}>Yes</span> : 'No' },
-        { key: 'is_active', label: 'Status', render: r => <span style={{ color: r.is_active ? 'var(--success)' : 'var(--danger)', fontWeight: 700 }}>{r.is_active ? 'Active' : 'Inactive'}</span> },
+        { key: 'name', label: 'Username', bold: true },
+        { key: 'email', label: 'User ID' },
+        { key: 'role_name', label: 'Role', render: u => (
+            <Badge color="var(--primary)">{u.role_name || 'Standard User'}</Badge>
+        )},
+        { key: 'branch_name', label: 'Primary Branch', render: u => (
+            <div className="flex items-center gap-2">
+                <Building size={14} color="var(--text-muted)" />
+                <span className="font-bold">{u.branch_name || '—'}</span>
+            </div>
+        )},
+        { key: 'allowed_branches', label: 'Access', render: u => {
+            const count = (u.allowed_branches || []).length;
+            return <Badge color="var(--bg-main)" style={{ border: '1px solid var(--border)' }}>{count} Branches</Badge>;
+        }},
+        { key: 'is_superadmin', label: 'Level', render: u => (
+            u.is_superadmin ? <Badge color="var(--primary)">ADMIN</Badge> : <span className="text-muted text-xs">Standard</span>
+        )},
+        { key: 'is_active', label: 'Status', render: u => (
+            <div className="flex items-center gap-2">
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: u.is_active ? 'var(--success)' : 'var(--danger)' }} />
+                <span style={{ color: u.is_active ? 'var(--success)' : 'var(--danger)', fontWeight: 800, fontSize: '10px' }}>
+                    {u.is_active ? 'ACTIVE' : 'OFFLINE'}
+                </span>
+            </div>
+        )},
     ];
 
     return (
         <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.25rem' }}>User Management</h4>
-                <button className="btn btn-primary" onClick={openAdd}>+ Add User</button>
+                <div className="flex items-center gap-3">
+                    <UsersIcon size={24} color="var(--primary)" />
+                    <h4 style={{ margin: 0, fontWeight: 900, fontSize: '1.25rem' }}>User Management</h4>
+                </div>
+                <button className="btn btn-primary" onClick={openAdd}>
+                    <Plus size={18} /> New User
+                </button>
             </div>
-            <DataTable columns={columns} rows={users} onEdit={openEdit} onDelete={remove} />
+            
+            <div className="card" style={{ padding: 0 }}>
+                {users.length === 0 ? <Empty /> : (
+                    <DataTable columns={columns} rows={users} onEdit={openEdit} onDelete={u => setConfirming(u)} />
+                )}
+            </div>
 
-            {modal && (
-                <Modal 
-                    title={modal === 'add' ? 'Add New User' : 'Edit User Profile'} 
-                    onClose={() => setModal(null)}
-                    footer={<>
-                        <button className="btn btn-ghost" onClick={() => setModal(null)}>Cancel</button>
-                        <button className="btn btn-primary" onClick={save}>Save Changes</button>
-                    </>}
-                >
-                    <FormField label="Full Name">
-                        <input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter full name" />
-                    </FormField>
-                    <FormField label="Email">
-                        <input className="input" type="email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
-                    </FormField>
-                    <FormField label={modal?.edit ? 'New Password (Optional)' : 'Password'}>
-                        <input className="input" type="password" value={form.password || ''} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="••••••••" />
-                    </FormField>
-                    <FormField label="Role">
-                        <select className="input" value={form.role_id || ''} onChange={e => setForm({ ...form, role_id: e.target.value || null })}>
-                            <option value="">Select Role</option>
-                            {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-                        </select>
-                    </FormField>
-                    <FormField label="Branch">
-                        <select className="input" value={form.branch_id || ''} onChange={e => setForm({ ...form, branch_id: e.target.value || null })}>
-                            <option value="">Select Branch</option>
-                            {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                        </select>
-                    </FormField>
-                    <FormField label="Department">
-                        <select className="input" value={form.department_id || ''} onChange={e => setForm({ ...form, department_id: e.target.value || null })}>
-                            <option value="">Select Department</option>
-                            {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
-                        </select>
-                    </FormField>
-                    <FormField label="Is Superadmin?">
-                        <select className="input" value={form.is_superadmin ? 'true' : 'false'} onChange={e => setForm({ ...form, is_superadmin: e.target.value === 'true' })}>
-                            <option value="false">No (Standard User)</option>
-                            <option value="true">Yes (Full Access)</option>
-                        </select>
-                    </FormField>
-                    {modal?.edit && (
-                        <FormField label="Account Status">
-                            <select className="input" value={form.is_active ? 'true' : 'false'} onChange={e => setForm({ ...form, is_active: e.target.value === 'true' })}>
-                                <option value="true">Active</option>
-                                <option value="false">Inactive</option>
-                            </select>
-                        </FormField>
-                    )}
-                </Modal>
+            {confirming && (
+                <Confirm 
+                    title="Delete User"
+                    message={`Are you sure you want to remove ${confirming.name}? This will revoke all system access permanently.`}
+                    onConfirm={remove}
+                    onCancel={() => setConfirming(null)}
+                />
             )}
         </>
     );
@@ -270,14 +501,15 @@ function BranchesTab() {
                         <button className="btn btn-primary" onClick={save}>Save Branch</button>
                     </>}
                 >
-                    <FormField label="Branch Name"><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter branch name" /></FormField>
-                    <FormField label="Location"><input className="input" value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="City or area" /></FormField>
-                    <FormField label="Is Warehouse?">
+                    <div className="form-group"><label className="form-label">Branch Name</label><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter branch name" /></div>
+                    <div className="form-group"><label className="form-label">Location</label><input className="input" value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="City or area" /></div>
+                    <div className="form-group">
+                        <label className="form-label">Is Warehouse?</label>
                         <select className="input" value={form.is_warehouse ? 'true' : 'false'} onChange={e => setForm({ ...form, is_warehouse: e.target.value === 'true' })}>
                             <option value="false">No (Retail Branch)</option>
                             <option value="true">Yes (Storage/Warehouse)</option>
                         </select>
-                    </FormField>
+                    </div>
                 </Modal>
             )}
         </>
@@ -348,11 +580,12 @@ function RolesTab() {
                         <button className="btn btn-primary" onClick={save}>Save Role</button>
                     </>}
                 >
-                    <FormField label="Role Name"><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Sales Executive" /></FormField>
-                    <FormField label="Permissions (JSON Format)">
+                    <div className="form-group"><label className="form-label">Role Name</label><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Sales Executive" /></div>
+                    <div className="form-group">
+                        <label className="form-label">Permissions (JSON Format)</label>
                         <textarea className="input" style={{ minHeight: 120, resize: 'vertical', fontFamily: 'monospace', fontSize: '12px' }}
                             value={form.permissionsStr || '{}'} onChange={e => setForm({ ...form, permissionsStr: e.target.value })} />
-                    </FormField>
+                    </div>
                 </Modal>
             )}
         </>
@@ -406,7 +639,7 @@ function DepartmentsTab() {
                         <button className="btn btn-primary" onClick={save}>Save Department</button>
                     </>}
                 >
-                    <FormField label="Department Name"><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Accounts & Finance" /></FormField>
+                    <div className="form-group"><label className="form-label">Department Name</label><input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Accounts & Finance" /></div>
                 </Modal>
             )}
         </>
@@ -472,40 +705,40 @@ function SalesPersonsTab({ branches }) {
                         <button className="btn btn-primary" onClick={save}>Save</button>
                     </>}
                 >
-                    <FormField label="Full Name">
+                    <div className="form-group"><label className="form-label">Full Name</label>
                         <input className="input" value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Enter full name" />
-                    </FormField>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <FormField label="Email">
-                            <input className="input" type="email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
-                        </FormField>
-                        <FormField label="Phone / Mobile">
-                            <input className="input" value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 9876543210" />
-                        </FormField>
                     </div>
-                    <FormField label="Assigned Branch">
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                        <div className="form-group"><label className="form-label">Email</label>
+                            <input className="input" type="email" value={form.email || ''} onChange={e => setForm({ ...form, email: e.target.value })} placeholder="email@example.com" />
+                        </div>
+                        <div className="form-group"><label className="form-label">Phone / Mobile</label>
+                            <input className="input" value={form.phone || ''} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 9876543210" />
+                        </div>
+                    </div>
+                    <div className="form-group"><label className="form-label">Assigned Branch</label>
                         <select className="input" value={form.branch_id || ''} onChange={e => setForm({ ...form, branch_id: e.target.value || null })}>
                             <option value="">Select Branch</option>
                             {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                         </select>
-                    </FormField>
+                    </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <FormField label="Commission %">
+                        <div className="form-group"><label className="form-label">Commission %</label>
                             <input className="input" type="number" min="0" max="100" step="0.5"
                                 value={form.commission_percent || 0} onChange={e => setForm({ ...form, commission_percent: e.target.value })} />
-                        </FormField>
-                        <FormField label="Monthly Target (₹)">
+                        </div>
+                        <div className="form-group"><label className="form-label">Monthly Target (₹)</label>
                             <input className="input" type="number" min="0"
                                 value={form.target_amount || 0} onChange={e => setForm({ ...form, target_amount: e.target.value })} />
-                        </FormField>
+                        </div>
                     </div>
                     {modal?.edit && (
-                        <FormField label="Status">
+                        <div className="form-group"><label className="form-label">Status</label>
                             <select className="input" value={form.is_active ? 'true' : 'false'} onChange={e => setForm({ ...form, is_active: e.target.value === 'true' })}>
                                 <option value="true">Active</option>
                                 <option value="false">Inactive</option>
                             </select>
-                        </FormField>
+                        </div>
                     )}
                 </Modal>
             )}
