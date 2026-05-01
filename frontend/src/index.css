@@ -3,50 +3,57 @@
    Brand Color: #02b30e (Green)
    =========================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --primary:        #0C8500;
   --primary-hover:  #0A7000;
-  --primary-light:  rgba(12, 133, 0, 0.1);
-  --primary-glow:   rgba(12, 133, 0, 0.22);
+  --primary-light:  rgba(12, 133, 0, 0.08);
+  --primary-glow:   rgba(12, 133, 0, 0.15);
   --primary-dark:   #085C00;
 
-  --bg-main:        #f4f6f9;
+  --bg-main:        #f8fafc;
   --bg-card:        #ffffff;
-  --text-main:      #0d1117;
-  --text-muted:     #6b7280;
-  --border:         #e5e7eb;
-  --success:        #02b30e;
+  --text-main:      #0f172a;
+  --text-muted:     #64748b;
+  --border:         #e2e8f0;
+  --success:        #10b981;
   --danger:         #ef4444;
   --warning:        #f59e0b;
 
   --sidebar-width:      240px;
   --sidebar-collapsed:  72px;
-  --transition:         all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow-sm:          0 1px 3px 0 rgba(0,0,0,0.06);
-  --shadow:             0 4px 12px -2px rgba(0,0,0,0.08);
-  --shadow-lg:          0 10px 30px -4px rgba(0,0,0,0.1);
+  --transition:         all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm:          0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow:             0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:          0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl:          0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 [data-theme='dark'] {
-  --bg-main:   #0d1117;
-  --bg-card:   #161b22;
-  --text-main: #e6edf3;
-  --text-muted:#8b949e;
-  --border:    #21262d;
+  --bg-main:   #0f172a;
+  --bg-card:   #1e293b;
+  --text-main: #f1f5f9;
+  --text-muted:#94a3b8;
+  --border:    #334155;
 }
 
 /* ========== Reset ========== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Inter', -apple-system, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, .font-heading {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 /* ========== Flexbox / Grid ========== */
@@ -276,6 +283,73 @@ body {
 .from-primary       { --tw-gradient-from: var(--primary); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent); }
 .to-\[\#06e815\]    { --tw-gradient-to: #06e815; }
 .to-\[\#01880a\]    { --tw-gradient-to: #01880a; }
+
+/* ========== Premium Modal ========== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: var(--shadow-xl);
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.modal-footer {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background: var(--bg-main);
+}
+
+/* ========== Custom Scrollbar ========== */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
 
 /* ========== Core Components ========== */
 
