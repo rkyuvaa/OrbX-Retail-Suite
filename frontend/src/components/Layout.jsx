@@ -10,7 +10,6 @@ import { clsx } from 'clsx';
 const navItems = [
   { path: '/',           name: 'Dashboard',    icon: LayoutDashboard },
   { path: '/pos',        name: 'POS / Billing', icon: ShoppingCart   },
-  { path: '/products',   name: 'Products',      icon: Package        },
   { path: '/inventory',  name: 'Inventory',     icon: BarChart3      },
   { path: '/transfers',  name: 'Transfers',     icon: ArrowLeftRight },
   { path: '/customers',  name: 'Customers',     icon: Users          },
