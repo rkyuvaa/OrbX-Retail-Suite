@@ -108,6 +108,13 @@ router.post('/setup', async (req, res) => {
         // Step 1b: Patch missing columns on existing tables (safe migrations)
         await client.query(`
             ALTER TABLE roles ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '{}';
+            ALTER TABLE branches ADD COLUMN IF NOT EXISTS is_warehouse BOOLEAN DEFAULT FALSE;
+            DO $$ 
+            BEGIN 
+                IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'branches_name_key') THEN
+                    ALTER TABLE branches ADD CONSTRAINT branches_name_key UNIQUE (name);
+                END IF;
+            END $$;
             ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_branches JSONB DEFAULT '[]';
             ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_modules JSONB DEFAULT '[]';
             ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superadmin BOOLEAN DEFAULT FALSE;
@@ -120,31 +127,42 @@ router.post('/setup', async (req, res) => {
             return res.status(400).json({ error: 'System already initialized' });
         }
 
-        // Step 3: Create Default Roles
+        // Step 3: Create Default Roles (Upsert)
         const adminRole = await client.query(
-            "INSERT INTO roles (name, permissions) VALUES ($1, $2) RETURNING id",
+            `INSERT INTO roles (name, permissions) 
+             VALUES ($1, $2) 
+             ON CONFLICT (name) DO UPDATE SET permissions = EXCLUDED.permissions 
+             RETURNING id`,
             ['Administrator', JSON.stringify({ all: true })]
         );
         await client.query(
-            "INSERT INTO roles (name, permissions) VALUES ($1, $2) RETURNING id",
+            `INSERT INTO roles (name, permissions) 
+             VALUES ($1, $2) 
+             ON CONFLICT (name) DO UPDATE SET permissions = EXCLUDED.permissions`,
             ['Warehouse Manager', JSON.stringify({ warehouse: true, inventory: true })]
         );
         await client.query(
-            "INSERT INTO roles (name, permissions) VALUES ($1, $2) RETURNING id",
+            `INSERT INTO roles (name, permissions) 
+             VALUES ($1, $2) 
+             ON CONFLICT (name) DO UPDATE SET permissions = EXCLUDED.permissions`,
             ['Branch User', JSON.stringify({ pos: true, inventory: true })]
         );
 
-        // Step 4: Create Default HQ Branch
+        // Step 4: Create Default HQ Branch (Upsert)
         const hqBranch = await client.query(
-            "INSERT INTO branches (name, location, is_warehouse) VALUES ($1, $2, $3) RETURNING id",
+            `INSERT INTO branches (name, location, is_warehouse) 
+             VALUES ($1, $2, $3) 
+             ON CONFLICT (name) DO UPDATE SET location = EXCLUDED.location 
+             RETURNING id`,
             ['Head Office & Warehouse', 'Main City', true]
         );
 
-        // Step 5: Create Superadmin User
+        // Step 5: Create Superadmin User (Upsert)
         const hashedPassword = await hashPassword('admin123');
         await client.query(
             `INSERT INTO users (name, email, password_hash, role_id, branch_id, is_superadmin, allowed_modules)
-             VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+             VALUES ($1, $2, $3, $4, $5, $6, $7) 
+             ON CONFLICT (email) DO NOTHING`,
             [
                 'Admin', 
                 'admin@orbx.com', 
