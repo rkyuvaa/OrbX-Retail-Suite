@@ -102,6 +102,11 @@ The frontend is the user interface you will interact with.
    ```
    *Expected Output: `Vite dev server running at http://localhost:5173`*
 
+   > [!TIP]
+   > If you are accessing the server from a different computer (e.g., via IP), use:
+   > `npm run dev -- --host`
+   > And ensure your firewall allows port 5173: `sudo ufw allow 5173/tcp`
+
 ---
 
 ## 🚦 Step 5: Testing the System

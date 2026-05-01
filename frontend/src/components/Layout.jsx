@@ -91,31 +91,31 @@ export default function Layout({ children }) {
       {/* Main Content */}
       <main className={clsx('main-content flex-1', isCollapsed && 'sidebar-collapsed')}>
         {/* Top Header */}
-        <header className="flex items-center justify-between mb-8">
+        <header className="flex items-center justify-between mb-8 sticky top-0 bg-white/80 backdrop-blur-md z-50 py-4 border-b border-border -mx-8 px-8">
           <div className="flex items-center gap-4">
             <button className="md:hidden btn btn-ghost p-2" onClick={() => setIsMobileOpen(true)}>
               <Menu size={24} />
             </button>
             <div>
-              <h2 className="text-2xl font-black">Dashboard</h2>
+              <h2 className="text-2xl font-black tracking-tight">Dashboard</h2>
               <p className="text-sm text-muted">Welcome back, Admin</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-2 bg-white border border-border px-4 py-2 rounded-xl shadow-sm">
+            <div className="hidden lg:flex items-center gap-3 bg-gray-50 border border-border px-4 py-2 rounded-xl focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                 <Search size={18} className="text-muted" />
                 <input className="border-none outline-none text-sm w-64 bg-transparent" placeholder="Search anything..." />
             </div>
-            <button className="btn btn-ghost relative p-2 bg-white border border-border shadow-sm">
+            <button className="btn btn-ghost relative p-2 bg-white border border-border shadow-sm hover:bg-gray-50">
               <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full border-2 border-white" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-white" />
             </button>
             <div className="flex items-center gap-3 bg-white border border-border p-1.5 pr-4 rounded-xl shadow-sm">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold">A</div>
-              <div className="hidden sm:block">
-                <p className="text-xs font-bold leading-none">Admin User</p>
-                <p className="text-[10px] text-muted font-bold">Main Branch</p>
+              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold">A</div>
+              <div className="hidden sm:flex flex-col justify-center">
+                <p className="text-sm font-bold leading-tight">Admin User</p>
+                <p className="text-[10px] text-muted font-bold uppercase tracking-wider">Main Branch</p>
               </div>
             </div>
           </div>

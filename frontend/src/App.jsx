@@ -11,7 +11,7 @@ const API_URL = 'http://localhost:5000';
 
 function Dashboard() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
+    <div className="p-2 lg:p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
       {[
         { label: 'Today\'s Sales', value: '₹42,500', trend: '+12%', color: 'var(--primary)' },
         { label: 'Transactions', value: '156', trend: '+8%', color: 'var(--success)' },
