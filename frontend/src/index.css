@@ -21,7 +21,7 @@
   --danger:         #ef4444;
   --warning:        #f59e0b;
 
-  --sidebar-width:      245px;
+  --sidebar-width:      240px;
   --sidebar-collapsed:  72px;
   --transition:         all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --shadow-sm:          0 1px 3px 0 rgba(0,0,0,0.06);
@@ -378,11 +378,16 @@ body {
   font-size:       0.875rem;
   transition:      var(--transition);
 }
-.nav-link:hover, .nav-link.active {
+.nav-link:hover {
   background: var(--primary-light);
   color:      var(--primary);
 }
-.nav-link.active { font-weight: 700; }
+.nav-link.active {
+  background: var(--primary);
+  color:      white;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(12, 133, 0, 0.2);
+}
 
 /* ========== Main Content ========== */
 .main-content {
