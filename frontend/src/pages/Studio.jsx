@@ -170,7 +170,7 @@ export default function Studio() {
   const currentTab = tabs[activeTabIdx];
 
   return (
-    <Layout title="Studio — Layout & Workflow">
+    <>
       <div className="flex gap-2 mb-6 items-center bg-white p-2 rounded-xl shadow-sm border border-border">
         <div style={{ display: 'flex', gap: 4, background: 'var(--bg-light)', padding: 4, borderRadius: 10 }}>
           {MODULES.map(m => (
@@ -343,6 +343,6 @@ export default function Studio() {
       {fieldModal && <FieldModal initial={fieldModal} tabs={tabs} stages={stages} stageRules={stageRules} onSave={saveField} onClose={() => setFieldModal(null)} />}
       {stageModal && <StageModal initial={stageModal} onSave={saveStage} onClose={() => setStageModal(null)} />}
       {deleting && <Confirm message={`Delete ${deleting.name}?`} onConfirm={confirmDelete} onCancel={() => setDeleting(null)} />}
-    </Layout>
+    </>
   );
 }

@@ -17,7 +17,7 @@ const BRANCH_ID = 1;
 // Dynamically set API URL based on current host
 const API_URL = `http://${window.location.hostname}:5000`;
 
-function PrivateRoute({ children, module }) {
+function PrivateRoute({ children, module, title }) {
   const isAuthenticated = !!localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const location = useLocation();
@@ -25,7 +25,7 @@ function PrivateRoute({ children, module }) {
   if (!isAuthenticated) return <Navigate to="/login" />;
 
   // Superadmin has access to everything
-  if (user.is_superadmin) return <Layout>{children}</Layout>;
+  if (user.is_superadmin) return <Layout title={title}>{children}</Layout>;
 
   // Check module permission if specified
   if (module) {
@@ -46,7 +46,7 @@ function PrivateRoute({ children, module }) {
     }
   }
 
-  return <Layout>{children}</Layout>;
+  return <Layout title={title}>{children}</Layout>;
 }
 
 function Dashboard() {
@@ -167,16 +167,16 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/setup" element={<Setup />} />
         
-        {/* Protected Routes */}
-        <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-        <Route path="/pos" element={<PrivateRoute module="pos"><POS /></PrivateRoute>} />
-        <Route path="/products" element={<PrivateRoute module="inventory"><Products /></PrivateRoute>} />
-        <Route path="/inventory" element={<PrivateRoute module="inventory"><Inventory /></PrivateRoute>} />
-        <Route path="/transfers" element={<PrivateRoute module="transfers"><div className="card p-12 text-center text-muted">Transfers Module - Coming Soon</div></PrivateRoute>} />
-        <Route path="/customers" element={<PrivateRoute module="crm"><div className="card p-12 text-center text-muted">Customers Module - Coming Soon</div></PrivateRoute>} />
-        <Route path="/studio" element={<PrivateRoute module="studio"><Studio /></PrivateRoute>} />
-        <Route path="/reports" element={<PrivateRoute module="reports"><div className="card p-12 text-center text-muted">Reports Module - Coming Soon</div></PrivateRoute>} />
-        <Route path="/settings" element={<PrivateRoute module="settings"><Settings /></PrivateRoute>} />
+         {/* Protected Routes */}
+        <Route path="/" element={<PrivateRoute title="Dashboard"><Dashboard /></PrivateRoute>} />
+        <Route path="/pos" element={<PrivateRoute module="pos" title="POS / Billing"><POS /></PrivateRoute>} />
+        <Route path="/products" element={<PrivateRoute module="inventory" title="Products"><Products /></PrivateRoute>} />
+        <Route path="/inventory" element={<PrivateRoute module="inventory" title="Inventory"><Inventory /></PrivateRoute>} />
+        <Route path="/transfers" element={<PrivateRoute module="transfers" title="Stock Transfers"><div className="card p-12 text-center text-muted">Transfers Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/customers" element={<PrivateRoute module="crm" title="Customers"><div className="card p-12 text-center text-muted">Customers Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/studio" element={<PrivateRoute module="studio" title="Studio — Layout & Workflow"><Studio /></PrivateRoute>} />
+        <Route path="/reports" element={<PrivateRoute module="reports" title="Reports & Analytics"><div className="card p-12 text-center text-muted">Reports Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute module="settings" title="Settings"><Settings /></PrivateRoute>} />
       </Routes>
 
       <Toaster position="bottom-right" toastOptions={{

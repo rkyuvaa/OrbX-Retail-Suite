@@ -148,7 +148,7 @@ export default function POS() {
   };
 
   return (
-    <Layout title="POS — Textile Billing">
+    <>
       {/* Keyboard shortcut legend */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
         {SHORTCUTS.map(s => (
@@ -387,6 +387,6 @@ export default function POS() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   );
 }
