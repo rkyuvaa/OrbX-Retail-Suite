@@ -148,17 +148,11 @@ function UsersTab({ roles, branches, departments }) {
         if (!form.name || !form.email) return toast.error('Name and Email are required');
         setSaving(true);
         try {
-            const payload = {
-                ...form,
-                role_id: form.role_id || null,
-                branch_id: form.branch_id || null,
-                department_id: form.department_id || null
-            };
             const isEdit = !!editing;
             const url = isEdit ? `/api/users/${editing}` : '/api/users';
             const method = isEdit ? 'PUT' : 'POST';
             
-            const r = await apiFetch(url, { method, body: JSON.stringify(payload) });
+            const r = await apiFetch(url, { method, body: JSON.stringify(form) });
             if (r.ok) {
                 toast.success(isEdit ? 'User updated' : 'User created');
                 setMode('list'); load();
