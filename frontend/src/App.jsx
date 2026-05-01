@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Setup from './pages/Setup';
 import Settings from './pages/Settings';
 import Inventory from './pages/Inventory';
+import Studio from './pages/Studio';
 import { startSyncEngine, fetchUpdates } from './utils/db';
 
 // Mock Branch ID for testing
@@ -173,6 +174,7 @@ export default function App() {
         <Route path="/inventory" element={<PrivateRoute module="inventory"><Inventory /></PrivateRoute>} />
         <Route path="/transfers" element={<PrivateRoute module="transfers"><div className="card p-12 text-center text-muted">Transfers Module - Coming Soon</div></PrivateRoute>} />
         <Route path="/customers" element={<PrivateRoute module="crm"><div className="card p-12 text-center text-muted">Customers Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/studio" element={<PrivateRoute module="studio"><Studio /></PrivateRoute>} />
         <Route path="/reports" element={<PrivateRoute module="reports"><div className="card p-12 text-center text-muted">Reports Module - Coming Soon</div></PrivateRoute>} />
         <Route path="/settings" element={<PrivateRoute module="settings"><Settings /></PrivateRoute>} />
       </Routes>

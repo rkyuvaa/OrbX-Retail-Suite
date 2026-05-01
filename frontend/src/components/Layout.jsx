@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, ShoppingCart, Package, ArrowLeftRight, 
   Users, BarChart3, Settings, Menu, ChevronLeft, 
-  LogOut, Bell, Search, Sun, Moon, Warehouse
+  LogOut, Bell, Search, Sun, Moon, Warehouse, Layers
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -14,6 +14,7 @@ const navItems = [
   { path: '/inventory',  name: 'Inventory',     icon: BarChart3      },
   { path: '/transfers',  name: 'Transfers',     icon: ArrowLeftRight },
   { path: '/customers',  name: 'Customers',     icon: Users          },
+  { path: '/studio',     name: 'Studio',        icon: Layers         },
   { path: '/reports',    name: 'Reports',       icon: BarChart3      },
   { path: '/settings',   name: 'Settings',      icon: Settings       },
 ];
