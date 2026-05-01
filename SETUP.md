@@ -132,6 +132,34 @@ The `Studio` and `User Management` modules are currently blueprints. To activate
 
 ---
 
+## 🔄 Step 7: Keep the App Always Running
+To ensure the app stays online even after you close the terminal, use **PM2**:
+
+1. **Install PM2**:
+   ```bash
+   sudo npm install -g pm2
+   ```
+
+2. **Start Backend**:
+   ```bash
+   cd backend
+   pm2 start npm --name "orbx-backend" -- run dev
+   ```
+
+3. **Start Frontend**:
+   ```bash
+   cd frontend
+   pm2 start npm --name "orbx-frontend" -- run dev -- --host
+   ```
+
+4. **Save the Process List**:
+   ```bash
+   pm2 save
+   pm2 startup
+   ```
+
+---
+
 ## ❓ Troubleshooting
 - **Error: EADDRINUSE**: Another process is using port 5000 or 5173. Restart your computer or kill the process.
 - **Connection Refused**: Your PostgreSQL service is not running. Open "Services" in Windows and start `postgresql-x64-16`.
