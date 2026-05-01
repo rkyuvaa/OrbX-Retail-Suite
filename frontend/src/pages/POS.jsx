@@ -105,46 +105,86 @@ export default function POS() {
         </div>
 
         {/* Payment Options Block */}
-        <div style={{ flex: '1', minWidth: 240, backgroundColor: '#fff', border: '2px solid var(--border)', borderRadius: 16, padding: 16 }}>
-          <p style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>
+        <div style={{ flex: '1', minWidth: 240, backgroundColor: '#fff', border: '2px solid var(--border)', borderRadius: 20, padding: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
+          <p style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12, letterSpacing: '0.05em' }}>
             Payment Options
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {['Cash', 'Card', 'UPI', 'Credit'].map(p => (
-              <button key={p} onClick={() => setPaymentType(p.toLowerCase())}
-                className={`py-2 px-3 rounded-xl border-2 text-[11px] font-black transition-all ${
-                  paymentType === p.toLowerCase() ? 'bg-primary border-primary text-white shadow-lg' : 'border-border hover:border-primary/50'
-                }`}>
-                {p}
-              </button>
-            ))}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[
+              { id: 'cash', label: 'Cash', icon: Banknote, color: '#10b981' },
+              { id: 'card', label: 'Card', icon: CreditCard, color: '#6366f1' },
+              { id: 'upi', label: 'UPI', icon: Smartphone, color: '#f59e0b' },
+              { id: 'credit', label: 'Credit', icon: Wallet, color: '#8b5cf6' }
+            ].map(p => {
+              const Icon = p.icon;
+              const isActive = paymentType === p.id;
+              return (
+                <button key={p.id} onClick={() => setPaymentType(p.id)}
+                  style={{
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, padding: '12px 8px', borderRadius: 16, border: '2px solid',
+                    borderColor: isActive ? p.color : 'var(--border)',
+                    background: isActive ? `linear-gradient(135deg, ${p.color}, ${p.color}dd)` : '#fff',
+                    color: isActive ? '#fff' : 'var(--text-main)',
+                    boxShadow: isActive ? `0 8px 16px ${p.color}44` : 'none',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    cursor: 'pointer'
+                  }}
+                  className={!isActive ? 'hover:border-primary/30 hover:bg-gray-50' : ''}>
+                  <Icon size={18} />
+                  <span style={{ fontSize: 11, fontWeight: 800 }}>{p.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Current Bill Summary Block */}
-        <div style={{ flex: '2', minWidth: 400, backgroundColor: '#fff', border: '2px solid var(--primary-light)', borderRadius: 16, padding: 16, display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ flex: '2', minWidth: 420, backgroundColor: '#fff', border: '2px solid var(--border)', borderRadius: 24, padding: 20, display: 'flex', justifyContent: 'space-between', boxShadow: '0 10px 30px rgba(0,0,0,0.04)' }}>
           <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 10, fontWeight: 900, color: 'var(--text-muted)' }}>ITEMS QTY:</span>
-              <span style={{ fontSize: 12, fontWeight: 900 }}>{totalQty}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)' }}>ITEMS QTY</span>
+              <span style={{ fontSize: 13, fontWeight: 900, backgroundColor: 'var(--bg-light)', padding: '2px 8px', borderRadius: 6 }}>{totalQty}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 10, fontWeight: 900, color: 'var(--text-muted)' }}>SUB TOTAL:</span>
-              <span style={{ fontSize: 12, fontWeight: 900 }}>₹{totalValue.toLocaleString()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)' }}>SUB TOTAL</span>
+              <span style={{ fontSize: 13, fontWeight: 900 }}>₹{totalValue.toLocaleString()}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 10, fontWeight: 900, color: 'var(--text-muted)' }}>TOTAL DISC:</span>
-              <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--danger)' }}>-₹{totalDiscount.toLocaleString()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontSize: 11, fontWeight: 900, color: 'var(--text-muted)' }}>TOTAL DISCOUNT</span>
+              <span style={{ fontSize: 13, fontWeight: 900, color: 'var(--danger)', backgroundColor: 'var(--danger-light)', padding: '2px 8px', borderRadius: 6 }}>-₹{totalDiscount.toLocaleString()}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: 8 }}>
-              <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--primary)' }}>GROSS VALUE:</span>
-              <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--primary)' }}>₹{grossValue.toLocaleString()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px dashed var(--border)', paddingTop: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 900, color: 'var(--primary)' }}>GROSS VALUE</span>
+              <span style={{ fontSize: 22, fontWeight: 900, color: 'var(--primary)', letterSpacing: '-0.02em' }}>₹{grossValue.toLocaleString()}</span>
             </div>
           </div>
           
-          <div style={{ width: 1, backgroundColor: 'var(--border)', margin: '0 16px' }}></div>
+          <div style={{ width: 2, backgroundColor: 'var(--border)', margin: '0 20px', borderRadius: 1 }}></div>
 
-        </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 120 }}>
+            <button onClick={clearBill} className="btn-ghost" style={{ 
+                fontSize: 11, fontWeight: 900, color: 'var(--danger)', border: '2px solid var(--danger-light)', 
+                borderRadius: 12, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                transition: 'all 0.2s', cursor: 'pointer'
+            }}>
+                <Eraser size={14}/> CLEAR
+            </button>
+            <button className="btn-ghost" style={{ 
+                fontSize: 11, fontWeight: 900, color: '#f59e0b', border: '2px solid #fef3c7', 
+                borderRadius: 12, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                cursor: 'pointer'
+            }}>
+                <Pause size={14}/> HOLD
+            </button>
+            <button onClick={saveBill} className="btn-primary" style={{ 
+                fontSize: 11, fontWeight: 900, padding: '12px', borderRadius: 14,
+                boxShadow: '0 8px 20px rgba(16, 185, 129, 0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                cursor: 'pointer'
+            }}>
+                <Save size={16}/> SAVE (F9)
+            </button>
+          </div>
       </div>
 
       {/* ── MAIN BODY: Billing Grid ───────────────────────────── */}
