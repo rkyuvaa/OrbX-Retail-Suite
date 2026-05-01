@@ -18,11 +18,15 @@ function apiFetch(path, options = {}) {
 // ─── Shared Modal ────────────────────────────────────────────────────────────
 function Modal({ title, onClose, children, footer }) {
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
+        <div className="modal-overlay">
+            <div className="modal-content">
                 <div className="modal-header">
-                    <h3 className="font-heading" style={{ margin: 0, fontSize: '1.1rem' }}>{title}</h3>
-                    <button onClick={onClose} className="btn-ghost" style={{ padding: '0.5rem', borderRadius: '50%' }}>✕</button>
+                    <h3>{title}</h3>
+                    <button onClick={onClose} style={{ 
+                        background: 'var(--primary-light)', color: 'var(--primary)', 
+                        border: 'none', width: '40px', height: '40px', borderRadius: '12px',
+                        cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold'
+                    }}>✕</button>
                 </div>
                 <div className="modal-body">
                     {children}

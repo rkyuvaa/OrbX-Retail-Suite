@@ -157,17 +157,18 @@ export default function Products() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[2000] flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up overflow-hidden border border-border my-auto">
-            <div className="bg-primary p-4 text-white flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-black">Add New Product</h3>
-              </div>
-              <button onClick={() => setShowAddModal(false)} className="hover:bg-white/20 p-2 rounded-xl transition-colors backdrop-blur-sm bg-white/10">
-                <Plus className="rotate-45" size={24}/>
-              </button>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Add New Product</h3>
+              <button onClick={() => setShowAddModal(false)} style={{ 
+                  background: 'var(--primary-light)', color: 'var(--primary)', 
+                  border: 'none', width: '40px', height: '40px', borderRadius: '12px',
+                  cursor: 'pointer', fontSize: '1.2rem', fontWeight: 'bold'
+              }}>✕</button>
             </div>
-            <form onSubmit={handleAddProduct} className="p-8 space-y-5">
+            <form onSubmit={handleAddProduct} className="modal-body">
+              <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase text-muted tracking-wider">Product Name</label>
                 <input required className="input" placeholder="e.g. iPhone 15 Pro Max" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
@@ -208,9 +209,10 @@ export default function Products() {
                     <input required type="number" className="input font-mono text-sm" value={formData.min_stock_level} onChange={e => setFormData({...formData, min_stock_level: e.target.value})} />
                 </div>
               </div>
-              <div className="flex gap-4 pt-6">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 btn btn-ghost border border-border hover:bg-gray-50 dark:hover:bg-slate-800 py-3">Cancel</button>
-                <button type="submit" className="flex-1 btn btn-primary shadow-lg shadow-primary/30 py-3">Save Product</button>
+              </div>
+              <div className="modal-footer">
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn btn-ghost" style={{ border: '1px solid var(--border)' }}>Cancel</button>
+                <button type="submit" className="btn btn-primary shadow-lg shadow-primary/30">Save Product</button>
               </div>
             </form>
           </div>

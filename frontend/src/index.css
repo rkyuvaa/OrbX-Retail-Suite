@@ -287,60 +287,67 @@ h1, h2, h3, h4, h5, .font-heading, button, input, select, textarea {
 .to-\[\#06e815\]    { --tw-gradient-to: #06e815; }
 .to-\[\#01880a\]    { --tw-gradient-to: #01880a; }
 
-/* ========== Premium Modal ========== */
+/* ========== Fullscreen Premium Modal ========== */
 .modal-overlay {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-main);
   display: flex;
   justify-content: center;
-  align-items: flex-start; /* Start from top to prevent header cutoff */
-  padding: 2rem 1rem;
-  overflow-y: auto; /* Allow overlay to scroll if modal is huge */
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
   animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 1.5rem;
-  width: 100%;
-  max-width: 540px;
-  margin: auto;
-  box-shadow: var(--shadow-xl);
-  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  max-height: 85vh; /* Ensure footer is usually visible */
+  box-shadow: none;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .modal-header {
-  padding: 1.25rem 1.75rem;
+  padding: 1.5rem 2.5rem;
   border-bottom: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0; /* Keep header sticky */
+  flex-shrink: 0;
+}
+
+.modal-header h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.02em;
 }
 
 .modal-body {
-  padding: 1.5rem 1.75rem;
+  padding: 3rem 2rem;
   overflow-y: auto;
-  flex: 1; /* Take up remaining space */
+  flex: 1;
   scrollbar-width: thin;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .modal-footer {
-  padding: 1rem 1.75rem;
+  padding: 1.5rem 2.5rem;
   border-top: 1px solid var(--border);
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
-  background: var(--bg-main);
+  gap: 1rem;
+  background: #f8fafc;
   flex-shrink: 0;
 }
 
