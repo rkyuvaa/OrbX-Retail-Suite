@@ -138,38 +138,30 @@ export default function Layout({ children }) {
           className="glass-panel flex items-center justify-between"
           style={{
             position: 'sticky', top: 0, zIndex: 50,
-            padding: '0.5rem 2.5rem',
+            padding: '0.2rem 2.5rem',
             margin: '-2rem -2.5rem 2rem -2.5rem',
           }}
         >
-          {/* Left: hamburger + page title */}
+          {/* Left: page title only */}
           <div className="flex items-center gap-4">
-            <button
-              className="btn btn-ghost p-2 md:hidden"
-              onClick={() => setIsMobileOpen(true)}
-            >
-              <Menu size={20} />
-            </button>
-            <div>
-              <h2 className="text-lg font-black tracking-tight text-primary">
-                {pageTitle}
-              </h2>
-            </div>
+            <h2 className="text-base font-black tracking-tight text-primary">
+              {pageTitle}
+            </h2>
           </div>
 
           {/* Right: bell + user */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Bell */}
             <button
               className="btn btn-ghost bg-white border border-border shadow-sm"
-              style={{ position: 'relative', padding: '0.4rem' }}
+              style={{ position: 'relative', padding: '0.25rem' }}
             >
-              <Bell size={16} />
+              <Bell size={14} />
               <span
                 style={{
-                  position: 'absolute', top: '4px', right: '4px',
-                  width: '6px', height: '6px', borderRadius: '50%',
-                  background: 'var(--danger)', border: '2px solid var(--bg-card)',
+                  position: 'absolute', top: '3px', right: '3px',
+                  width: '5px', height: '5px', borderRadius: '50%',
+                  background: 'var(--danger)', border: '1.5px solid var(--bg-card)',
                 }}
               />
             </button>
@@ -177,17 +169,15 @@ export default function Layout({ children }) {
             {/* User */}
             <div
               className="flex items-center gap-2 bg-white border border-border rounded-lg shadow-sm"
-              style={{ padding: '0.25rem 0.75rem 0.25rem 0.25rem' }}
+              style={{ padding: '0.15rem 0.6rem 0.15rem 0.15rem' }}
             >
               <div
-                className="rounded flex items-center justify-center font-black text-white text-xs bg-primary"
-                style={{ width: '28px', height: '28px', flexShrink: 0 }}
+                className="rounded flex items-center justify-center font-black text-white"
+                style={{ width: '24px', height: '24px', flexShrink: 0, fontSize: '10px', background: 'var(--primary)' }}
               >
                 A
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <p className="text-xs font-bold" style={{ lineHeight: 1.2 }}>Admin</p>
-              </div>
+              <p className="text-[11px] font-bold" style={{ lineHeight: 1 }}>Admin</p>
             </div>
           </div>
         </header>
