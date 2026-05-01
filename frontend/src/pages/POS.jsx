@@ -21,7 +21,7 @@ const SALESMEN = ['Ramesh', 'Suresh', 'Deepak', 'Anil'];
 export default function POS() {
   const [search, setSearch] = useState('');
   const [cartItems, setCartItems] = useState([]);
-  const [customer, setCustomer] = useState({ phone: '', name: '' });
+  const [customer, setCustomer] = useState({ phone: '', name: '', address: '' });
   const [paymentType, setPaymentType] = useState('cash');
   const [discountPercent, setDiscountPercent] = useState(0);
   const [selectedItemIdx, setSelectedItemIdx] = useState(0);
@@ -64,7 +64,7 @@ export default function POS() {
 
   const clearBill = () => {
     setCartItems([]);
-    setCustomer({ phone: '', name: '' });
+    setCustomer({ phone: '', name: '', address: '' });
     setDiscountPercent(0);
     toast('Bill Cleared', { icon: '🧹' });
   };
@@ -84,7 +84,7 @@ export default function POS() {
   const grossValue = totalValue - totalDiscount;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] gap-4 animate-fade-in p-2">
+    <div className="flex flex-col h-[calc(100vh-110px)] gap-4 animate-fade-in p-2" style={{ marginTop: '-20px' }}>
       
       {/* ── TOP SECTION: Information Panels ───────────────────── */}
       <div style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
@@ -99,6 +99,8 @@ export default function POS() {
                 value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
             <input className="input py-2 text-sm w-full" placeholder="Customer Name" 
                 value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} />
+            <input className="input py-2 text-sm w-full" placeholder="Address" 
+                value={customer.address} onChange={e => setCustomer({...customer, address: e.target.value})} />
           </div>
         </div>
 
