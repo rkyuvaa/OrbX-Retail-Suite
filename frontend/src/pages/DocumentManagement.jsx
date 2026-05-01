@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Plus, Pencil, Trash2, FileText, Settings, Database, Layout as LayoutIcon, Image as ImageIcon } from 'lucide-react';
 import { Modal, Badge } from '../components/Shared';
 import api from '../utils/api';
