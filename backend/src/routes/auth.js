@@ -13,7 +13,7 @@ router.post('/setup', async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // Step 1: Create tables if they don't exist
+        // Step 1: Create tables if they don't exist + patch missing columns
         await client.query(`
             CREATE TABLE IF NOT EXISTS roles (
                 id SERIAL PRIMARY KEY,
@@ -103,6 +103,14 @@ router.post('/setup', async (req, res) => {
                 status VARCHAR(20) DEFAULT 'SUCCESS',
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
+        `);
+
+        // Step 1b: Patch missing columns on existing tables (safe migrations)
+        await client.query(`
+            ALTER TABLE roles ADD COLUMN IF NOT EXISTS permissions JSONB DEFAULT '{}';
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_branches JSONB DEFAULT '[]';
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS allowed_modules JSONB DEFAULT '[]';
+            ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superadmin BOOLEAN DEFAULT FALSE;
         `);
 
         // Step 2: Check if already setup
