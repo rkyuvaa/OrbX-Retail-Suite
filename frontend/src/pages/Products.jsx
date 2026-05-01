@@ -136,41 +136,46 @@ export default function Products() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fade-in overflow-hidden">
-            <div className="bg-primary p-6 text-white flex justify-between items-center">
-              <h3 className="text-xl font-black">Add New Product</h3>
-              <button onClick={() => setShowAddModal(false)} className="hover:bg-white/20 p-1 rounded-lg transition-colors"><Plus className="rotate-45" size={24}/></button>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[2000] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg animate-slide-up overflow-hidden border border-border">
+            <div className="bg-gradient-to-r from-primary to-[#a855f7] p-6 text-white flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-black">Add New Product</h3>
+                <p className="text-white/80 text-sm font-medium mt-1">Enter product details for inventory</p>
+              </div>
+              <button onClick={() => setShowAddModal(false)} className="hover:bg-white/20 p-2 rounded-xl transition-colors backdrop-blur-sm bg-white/10">
+                <Plus className="rotate-45" size={24}/>
+              </button>
             </div>
-            <form onSubmit={handleAddProduct} className="p-6 space-y-4">
+            <form onSubmit={handleAddProduct} className="p-8 space-y-5">
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase text-muted">Product Name</label>
-                <input required className="input" placeholder="e.g. iPhone 15 Pro" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                <label className="text-xs font-black uppercase text-muted tracking-wider">Product Name</label>
+                <input required className="input" placeholder="e.g. iPhone 15 Pro Max" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="text-xs font-black uppercase text-muted text-left block">SKU Code</label>
-                  <input required className="input" placeholder="IPH15P-BLK" value={formData.sku} onChange={e => setFormData({...formData, sku: e.target.value})} />
+                  <label className="text-xs font-black uppercase text-muted tracking-wider block">SKU Code</label>
+                  <input required className="input font-mono text-sm" placeholder="IPH15P-BLK" value={formData.sku} onChange={e => setFormData({...formData, sku: e.target.value})} />
                 </div>
                 <div className="space-y-2">
-                    <label className="text-xs font-black uppercase text-muted text-left block">Barcode</label>
-                    <input className="input" placeholder="123456789" value={formData.barcode} onChange={e => setFormData({...formData, barcode: e.target.value})} />
+                    <label className="text-xs font-black uppercase text-muted tracking-wider block">Barcode</label>
+                    <input className="input font-mono text-sm" placeholder="123456789" value={formData.barcode} onChange={e => setFormData({...formData, barcode: e.target.value})} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2">
-                    <label className="text-xs font-black uppercase text-muted text-left block">Category</label>
+                    <label className="text-xs font-black uppercase text-muted tracking-wider block">Category</label>
                     <input required className="input" placeholder="Electronics" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} />
                 </div>
                 <div className="space-y-2">
-                    <label className="text-xs font-black uppercase text-muted text-left block">Price (₹)</label>
-                    <input required type="number" step="0.01" className="input font-mono" placeholder="0.00" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                    <label className="text-xs font-black uppercase text-muted tracking-wider block">Price (₹)</label>
+                    <input required type="number" step="0.01" className="input font-mono text-sm" placeholder="0.00" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2">
-                    <label className="text-xs font-black uppercase text-muted text-left block">GST %</label>
-                    <select className="input" value={formData.tax_percent} onChange={e => setFormData({...formData, tax_percent: e.target.value})}>
+                    <label className="text-xs font-black uppercase text-muted tracking-wider block">GST %</label>
+                    <select className="input cursor-pointer" value={formData.tax_percent} onChange={e => setFormData({...formData, tax_percent: e.target.value})}>
                         <option value="0">0%</option>
                         <option value="5">5%</option>
                         <option value="12">12%</option>
@@ -179,13 +184,13 @@ export default function Products() {
                     </select>
                 </div>
                 <div className="space-y-2">
-                    <label className="text-xs font-black uppercase text-muted text-left block">Min Stock Alert</label>
-                    <input required type="number" className="input" value={formData.min_stock_level} onChange={e => setFormData({...formData, min_stock_level: e.target.value})} />
+                    <label className="text-xs font-black uppercase text-muted tracking-wider block">Min Stock Alert</label>
+                    <input required type="number" className="input font-mono text-sm" value={formData.min_stock_level} onChange={e => setFormData({...formData, min_stock_level: e.target.value})} />
                 </div>
               </div>
-              <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 btn btn-ghost border border-border">Cancel</button>
-                <button type="submit" className="flex-1 btn btn-primary shadow-lg shadow-primary/30">Save Product</button>
+              <div className="flex gap-4 pt-6">
+                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 btn btn-ghost border border-border hover:bg-gray-50 dark:hover:bg-slate-800 py-3">Cancel</button>
+                <button type="submit" className="flex-1 btn btn-primary shadow-lg shadow-primary/30 py-3">Save Product</button>
               </div>
             </form>
           </div>

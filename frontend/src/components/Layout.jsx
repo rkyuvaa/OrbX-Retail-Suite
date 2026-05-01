@@ -91,14 +91,14 @@ export default function Layout({ children }) {
       {/* Main Content */}
       <main className={clsx('main-content flex-1', isCollapsed && 'sidebar-collapsed')}>
         {/* Top Header */}
-        <header className="flex items-center justify-between mb-8 sticky top-0 bg-white/80 backdrop-blur-md z-50 py-4 border-b border-border -mx-8 px-8">
+        <header className="flex items-center justify-between mb-8 sticky top-0 glass-panel z-50 py-4 border-b border-border -mx-8 px-8 transition-all">
           <div className="flex items-center gap-4">
             <button className="md:hidden btn btn-ghost p-2" onClick={() => setIsMobileOpen(true)}>
               <Menu size={24} />
             </button>
             <div>
-              <h2 className="text-2xl font-black tracking-tight">Dashboard</h2>
-              <p className="text-sm text-muted">Welcome back, Admin</p>
+              <h2 className="text-2xl font-black tracking-tight gradient-text">Dashboard</h2>
+              <p className="text-sm text-muted font-medium">Welcome back, Admin</p>
             </div>
           </div>
 

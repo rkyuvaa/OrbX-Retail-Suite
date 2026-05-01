@@ -81,8 +81,13 @@ router.post('/', async (req, res) => {
 router.get('/updates', async (req, res) => {
     const { branch_id, lastSync } = req.query;
     try {
-        const products = await pool.query('SELECT * FROM products WHERE created_at > $1', [lastSync || '1970-01-01']);
-        const inventory = await pool.query('SELECT * FROM inventory WHERE branch_id = $1 AND last_updated > $2', [branch_id, lastSync || '1970-01-01']);
+        const syncDate = lastSync || '1970-01-01T00:00:00Z';
+        
+        // Log query for debugging
+        console.log(`Syncing for branch ${branch_id} since ${syncDate}`);
+
+        const products = await pool.query('SELECT * FROM products WHERE created_at > $1', [syncDate]);
+        const inventory = await pool.query('SELECT * FROM inventory WHERE branch_id = $1 AND last_updated > $2', [branch_id || 1, syncDate]);
         
         res.json({
             timestamp: new Date().toISOString(),
@@ -90,7 +95,8 @@ router.get('/updates', async (req, res) => {
             inventory: inventory.rows
         });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error in /updates route:', err.message);
+        res.status(500).json({ error: 'Database error', details: err.message });
     }
 });
 
