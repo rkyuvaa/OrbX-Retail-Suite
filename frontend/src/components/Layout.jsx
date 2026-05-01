@@ -8,7 +8,6 @@ import {
 import { clsx } from 'clsx';
 
 const navItems = [
-  { path: '/',           name: 'Dashboard',    icon: LayoutDashboard },
   { path: '/pos',        name: 'POS / Billing', icon: ShoppingCart   },
   { path: '/products',   name: 'Products',      icon: Package        },
   { path: '/inventory',  name: 'Inventory',     icon: BarChart3      },
@@ -35,8 +34,9 @@ export default function Layout({ children }) {
   const [isDarkMode, setIsDarkMode]     = useState(false);
   const location = useLocation();
   
-  // Get user from localStorage
+  // Get data from localStorage
   const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const activeBranch = JSON.parse(localStorage.getItem('activeBranch') || '{}');
   const isAdmin = !!user.is_superadmin;
   const allowedModules = user.allowed_modules || {};
 
@@ -181,8 +181,22 @@ export default function Layout({ children }) {
             </h2>
           </div>
 
-          {/* Right: bell + user */}
+          {/* Right: branch selector + bell + user */}
           <div className="flex items-center gap-2">
+            {/* Branch Badge */}
+            <button 
+              onClick={() => window.location.href = '/branch-select'}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-white hover:bg-gray-50 transition-colors cursor-pointer group"
+            >
+              <Building size={14} className="text-primary" />
+              <div className="text-left">
+                <p className="text-[10px] font-black uppercase text-muted leading-none mb-0.5">Active Branch</p>
+                <p className="text-[11px] font-bold text-primary leading-none group-hover:underline">
+                  {activeBranch.name || 'Select Branch'}
+                </p>
+              </div>
+            </button>
+
             {/* Bell */}
             <button
               className="btn btn-ghost bg-white border border-border shadow-sm"
