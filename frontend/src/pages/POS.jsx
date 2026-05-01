@@ -142,29 +142,6 @@ export default function POS() {
           
           <div style={{ width: 1, backgroundColor: 'var(--border)', margin: '0 16px' }}></div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 100 }}>
-            <button onClick={clearBill} className="btn-ghost" style={{ fontSize: 10, fontWeight: 900, color: 'var(--danger)', border: '1px solid var(--danger)', borderRadius: 8, padding: '8px' }}>CLEAR</button>
-            <button className="btn-ghost" style={{ fontSize: 10, fontWeight: 900, color: 'var(--warning)', border: '1px solid var(--warning)', borderRadius: 8, padding: '8px' }}>HOLD</button>
-            <button onClick={saveBill} className="btn-primary" style={{ fontSize: 10, fontWeight: 900, padding: '8px' }}>SAVE (F9)</button>
-          </div>
-        </div>
-
-        {/* Search Panel */}
-        <div style={{ width: 220, position: 'relative' }}>
-            <div className="relative">
-              <input ref={searchRef} className="input py-4 text-sm font-black w-full" 
-                placeholder="F1 - Barcode" value={search} onChange={e => setSearch(e.target.value)} />
-            </div>
-            {search && filtered.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-primary/20 rounded-2xl shadow-2xl z-50 max-h-48 overflow-y-auto">
-                {filtered.map(item => (
-                  <div key={item.id} className="p-3 hover:bg-primary/5 cursor-pointer border-b border-border last:border-0" onClick={() => addToCart(item)}>
-                    <p className="text-xs font-black">{item.name}</p>
-                    <p className="text-[10px] text-primary font-bold">₹{item.price} • {item.code}</p>
-                  </div>
-                ))}
-              </div>
-            )}
         </div>
       </div>
 
@@ -222,28 +199,8 @@ export default function POS() {
                   </td>
                 </tr>
               ))}
-              {cartItems.length === 0 && (
-                <tr>
-                    <td colSpan="11" className="p-20 text-center">
-                        <div className="flex flex-col items-center opacity-20">
-                            <ShoppingBag size={60} />
-                            <p className="mt-4 font-black text-lg">No items added to bill</p>
-                            <p className="text-xs font-bold">Start scanning barcodes (F1) to begin</p>
-                        </div>
-                    </td>
-                </tr>
-              )}
             </tbody>
           </table>
-        </div>
-
-        {/* Footer Shortcut Bar */}
-        <div className="bg-gray-50 px-4 py-2 border-t-2 border-border flex gap-4 overflow-x-auto no-scrollbar">
-            {['F1 Scan', 'F2 Phone', 'F4 Clear', 'F9 Save'].map(s => (
-                <span key={s} className="text-[9px] font-black text-muted whitespace-nowrap bg-white px-2 py-1 rounded border border-border">
-                    <span className="text-primary mr-1">{s.split(' ')[0]}</span> {s.split(' ')[1]}
-                </span>
-            ))}
         </div>
       </div>
     </div>
