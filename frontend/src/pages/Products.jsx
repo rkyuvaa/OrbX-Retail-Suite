@@ -168,7 +168,7 @@ export default function Products() {
               }}>✕</button>
             </div>
             <form onSubmit={handleAddProduct} className="modal-body">
-              <div style={{ maxWidth: '800px', margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase text-muted tracking-wider">Product Name</label>
                 <input required className="input" placeholder="e.g. iPhone 15 Pro Max" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
