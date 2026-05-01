@@ -87,37 +87,31 @@ export default function POS() {
     <div className="flex flex-col h-[calc(100vh-140px)] gap-4 animate-fade-in p-2">
       
       {/* ── TOP SECTION: Information Panels ───────────────────── */}
-      <div className="grid grid-cols-12 gap-4">
+      <div style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
         
         {/* Customer Details Block */}
-        <div className="col-span-3 bg-white border-2 border-border rounded-2xl p-4 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-3 flex items-center gap-2">
-            <User size={12}/> Customer Details
+        <div style={{ flex: '1', minWidth: 280, backgroundColor: '#fff', border: '2px solid var(--border)', borderRadius: 16, padding: 16 }}>
+          <p style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>
+            Customer Details
           </p>
           <div className="space-y-3">
-            <div className="relative">
-              <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-              <input ref={phoneRef} className="input pl-9 py-2 text-sm w-full" placeholder="Phone Number (F2)" 
+            <input ref={phoneRef} className="input py-2 text-sm w-full" placeholder="Phone Number (F2)" 
                 value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} />
-            </div>
-            <div className="relative">
-              <User size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
-              <input className="input pl-9 py-2 text-sm w-full" placeholder="Customer Name" 
+            <input className="input py-2 text-sm w-full" placeholder="Customer Name" 
                 value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} />
-            </div>
           </div>
         </div>
 
         {/* Payment Options Block */}
-        <div className="col-span-3 bg-white border-2 border-border rounded-2xl p-4 shadow-sm">
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-3 flex items-center gap-2">
-            <CreditCard size={12}/> Payment Options
+        <div style={{ flex: '1', minWidth: 240, backgroundColor: '#fff', border: '2px solid var(--border)', borderRadius: 16, padding: 16 }}>
+          <p style={{ fontSize: 10, fontWeight: 900, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>
+            Payment Options
           </p>
-          <div className="grid grid-cols-2 gap-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
             {['Cash', 'Card', 'UPI', 'Credit'].map(p => (
               <button key={p} onClick={() => setPaymentType(p.toLowerCase())}
                 className={`py-2 px-3 rounded-xl border-2 text-[11px] font-black transition-all ${
-                  paymentType === p.toLowerCase() ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20' : 'border-border hover:border-primary/50'
+                  paymentType === p.toLowerCase() ? 'bg-primary border-primary text-white shadow-lg' : 'border-border hover:border-primary/50'
                 }`}>
                 {p}
               </button>
@@ -126,48 +120,40 @@ export default function POS() {
         </div>
 
         {/* Current Bill Summary Block */}
-        <div className="col-span-4 bg-white border-2 border-primary/20 rounded-2xl p-4 shadow-sm flex items-center justify-between">
-          <div className="space-y-1">
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-muted uppercase w-24">Items Qty:</span>
-              <span className="text-sm font-black">{totalQty}</span>
+        <div style={{ flex: '2', minWidth: 400, backgroundColor: '#fff', border: '2px solid var(--primary-light)', borderRadius: 16, padding: 16, display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 10, fontWeight: 900, color: 'var(--text-muted)' }}>ITEMS QTY:</span>
+              <span style={{ fontSize: 12, fontWeight: 900 }}>{totalQty}</span>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-muted uppercase w-24">Sub Total:</span>
-              <span className="text-sm font-black">₹{totalValue.toLocaleString()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 10, fontWeight: 900, color: 'var(--text-muted)' }}>SUB TOTAL:</span>
+              <span style={{ fontSize: 12, fontWeight: 900 }}>₹{totalValue.toLocaleString()}</span>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-[10px] font-black text-muted uppercase w-24">Total Disc:</span>
-              <span className="text-sm font-black text-danger">-₹{totalDiscount.toLocaleString()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 10, fontWeight: 900, color: 'var(--text-muted)' }}>TOTAL DISC:</span>
+              <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--danger)' }}>-₹{totalDiscount.toLocaleString()}</span>
             </div>
-            <div className="flex items-center gap-4 pt-1">
-              <span className="text-[10px] font-black text-primary uppercase w-24">Gross Value:</span>
-              <span className="text-lg font-black text-primary">₹{grossValue.toLocaleString()}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 900, color: 'var(--primary)' }}>GROSS VALUE:</span>
+              <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--primary)' }}>₹{grossValue.toLocaleString()}</span>
             </div>
           </div>
           
-          <div className="h-full w-[1px] bg-border mx-4"></div>
+          <div style={{ width: 1, backgroundColor: 'var(--border)', margin: '0 16px' }}></div>
 
-          {/* Action Buttons Stack */}
-          <div className="flex flex-col gap-2">
-            <button onClick={clearBill} className="btn btn-ghost btn-sm text-danger hover:bg-danger/10 border border-danger/20 w-24 h-9 font-black text-[10px]">
-              <Eraser size={14} className="mr-1"/> CLEAR
-            </button>
-            <button className="btn btn-ghost btn-sm text-amber-600 hover:bg-amber-50 border border-amber-200 w-24 h-9 font-black text-[10px]">
-              <Pause size={14} className="mr-1"/> HOLD
-            </button>
-            <button onClick={saveBill} className="btn btn-primary btn-sm w-24 h-9 font-black text-[10px] shadow-lg shadow-primary/30">
-              <Save size={14} className="mr-1"/> SAVE (F9)
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, minWidth: 100 }}>
+            <button onClick={clearBill} className="btn-ghost" style={{ fontSize: 10, fontWeight: 900, color: 'var(--danger)', border: '1px solid var(--danger)', borderRadius: 8, padding: '8px' }}>CLEAR</button>
+            <button className="btn-ghost" style={{ fontSize: 10, fontWeight: 900, color: 'var(--warning)', border: '1px solid var(--warning)', borderRadius: 8, padding: '8px' }}>HOLD</button>
+            <button onClick={saveBill} className="btn-primary" style={{ fontSize: 10, fontWeight: 900, padding: '8px' }}>SAVE (F9)</button>
           </div>
         </div>
 
-        {/* Search / Scan Panel */}
-        <div className="col-span-2 relative flex flex-col justify-center">
+        {/* Search Panel */}
+        <div style={{ width: 220, position: 'relative' }}>
             <div className="relative">
-              <Scan size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
-              <input ref={searchRef} className="input pl-11 py-4 text-sm font-black w-full border-primary/40 focus:border-primary shadow-xl shadow-primary/5" 
-                placeholder="F1 - Scan Barcode" value={search} onChange={e => setSearch(e.target.value)} />
+              <input ref={searchRef} className="input py-4 text-sm font-black w-full" 
+                placeholder="F1 - Barcode" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
             {search && filtered.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-primary/20 rounded-2xl shadow-2xl z-50 max-h-48 overflow-y-auto">
