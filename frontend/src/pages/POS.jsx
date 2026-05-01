@@ -185,6 +185,7 @@ export default function POS() {
                 <Save size={16}/> SAVE (F9)
             </button>
           </div>
+        </div>
       </div>
 
       {/* ── MAIN BODY: Billing Grid ───────────────────────────── */}
