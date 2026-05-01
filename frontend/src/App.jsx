@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import POS from './pages/POS';
+import Products from './pages/Products';
 import { startSyncEngine, fetchUpdates } from './utils/db';
 
 // Mock Branch ID for testing
@@ -90,7 +91,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/pos" element={<POS />} />
-          <Route path="/products" element={<div className="card p-12 text-center text-muted">Products Module - Coming Soon</div>} />
+          <Route path="/products" element={<Products />} />
           <Route path="/inventory" element={<div className="card p-12 text-center text-muted">Inventory Module - Coming Soon</div>} />
           <Route path="/transfers" element={<div className="card p-12 text-center text-muted">Transfers Module - Coming Soon</div>} />
           <Route path="/customers" element={<div className="card p-12 text-center text-muted">Customers Module - Coming Soon</div>} />
