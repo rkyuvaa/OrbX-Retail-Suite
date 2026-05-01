@@ -34,6 +34,33 @@ export default function Layout({ children }) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isDarkMode, setIsDarkMode]     = useState(false);
   const location = useLocation();
+  
+  // Get user from localStorage
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isAdmin = !!user.is_superadmin;
+  const allowedModules = user.allowed_modules || {};
+
+  // Filter navigation items based on permissions
+  const filteredNav = navItems.filter(item => {
+    if (isAdmin) return true;
+    
+    // Check if user has specific module role for this path
+    // Mapping paths to module keys
+    const pathMap = {
+      '/pos': 'pos',
+      '/products': 'inventory',
+      '/inventory': 'inventory',
+      '/transfers': 'transfers',
+      '/customers': 'crm',
+      '/reports': 'reports',
+      '/settings': 'settings'
+    };
+    
+    const modKey = pathMap[item.path];
+    if (!modKey) return true; // Always show dashboard
+    
+    return !!allowedModules[modKey];
+  });
 
   const toggleDarkMode = () => {
     const next = !isDarkMode;
@@ -78,7 +105,7 @@ export default function Layout({ children }) {
 
         {/* Nav */}
         <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          {navItems.map((item) => (
+          {filteredNav.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -177,12 +204,15 @@ export default function Layout({ children }) {
               style={{ padding: '0.15rem 0.6rem 0.15rem 0.15rem' }}
             >
               <div
-                className="rounded flex items-center justify-center font-black text-white"
+                className="rounded flex items-center justify-center font-black text-white uppercase"
                 style={{ width: '24px', height: '24px', flexShrink: 0, fontSize: '10px', background: 'var(--primary)' }}
               >
-                A
+                {user.name ? user.name.charAt(0) : 'U'}
               </div>
-              <p className="text-[11px] font-bold" style={{ lineHeight: 1 }}>Admin</p>
+              <div style={{ lineHeight: 1 }}>
+                <p className="text-[11px] font-bold">{user.name || 'User'}</p>
+                <p className="text-[8px] text-muted font-bold uppercase">{user.role_name || (isAdmin ? 'Super Admin' : 'Staff')}</p>
+              </div>
             </div>
           </div>
         </header>

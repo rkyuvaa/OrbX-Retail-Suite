@@ -200,7 +200,12 @@ router.post('/setup', async (req, res) => {
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
-        const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        const result = await pool.query(`
+            SELECT u.*, r.name as role_name 
+            FROM users u 
+            LEFT JOIN roles r ON u.role_id = r.id 
+            WHERE u.email = $1
+        `, [email]);
         const user = result.rows[0];
 
         if (!user || !(await verifyPassword(password, user.password_hash))) {
@@ -212,7 +217,17 @@ router.post('/login', async (req, res) => {
         }
 
         const token = generateToken({ id: user.id, email: user.email });
-        res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+        res.json({ 
+            token, 
+            user: { 
+                id: user.id, 
+                name: user.name, 
+                email: user.email,
+                role_name: user.role_name,
+                is_superadmin: !!user.is_superadmin,
+                allowed_modules: user.allowed_modules || {}
+            } 
+        });
     } catch (error) {
         res.status(500).json({ error: 'Login failed', details: error.message });
     }
