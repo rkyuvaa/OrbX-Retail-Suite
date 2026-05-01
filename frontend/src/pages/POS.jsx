@@ -3,7 +3,7 @@ import {
   Search, User, Phone, CreditCard, ShoppingBag, 
   Trash2, Plus, Minus, CheckCircle, X, 
   Keyboard, Banknote, Wallet, Smartphone,
-  Pause, Save, Eraser, UserPlus, Tag, Barcode
+  Pause, Save, Eraser, UserPlus, Tag, Scan
 } from 'lucide-react';
 import { Badge } from '../components/Shared';
 import api from '../utils/api';
@@ -165,7 +165,7 @@ export default function POS() {
         {/* Search / Scan Panel */}
         <div className="col-span-2 relative flex flex-col justify-center">
             <div className="relative">
-              <Barcode size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
+              <Scan size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-primary" />
               <input ref={searchRef} className="input pl-11 py-4 text-sm font-black w-full border-primary/40 focus:border-primary shadow-xl shadow-primary/5" 
                 placeholder="F1 - Scan Barcode" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
