@@ -138,7 +138,7 @@ export default function Products() {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[2000] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg animate-slide-up overflow-hidden border border-border">
-            <div className="bg-gradient-to-r from-primary to-[#34d399] p-6 text-white flex justify-between items-center">
+            <div style={{background: 'linear-gradient(135deg, #02b30e 0%, #06e815 100%)'}} className="p-6 text-white flex justify-between items-center">
               <div>
                 <h3 className="text-xl font-black">Add New Product</h3>
                 <p className="text-white/80 text-sm font-medium mt-1">Enter product details for inventory</p>
