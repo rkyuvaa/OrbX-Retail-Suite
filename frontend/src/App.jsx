@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { LayoutDashboard, Package } from 'lucide-react';
 import Layout from './components/Layout';
 import POS from './pages/POS';
 import Products from './pages/Products';
