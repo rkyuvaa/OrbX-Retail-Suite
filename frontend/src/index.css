@@ -292,34 +292,33 @@ h1, h2, h3, h4, h5, .font-heading, button, input, select, textarea {
 .to-\[\#01880a\]    { --tw-gradient-to: #01880a; }
 
 /* ========== True Fullscreen Premium Modal ========== */
-/* ========== Integrated Fullscreen Modal ========== */
+/* ========== Integrated Workspace Modal ========== */
 .modal-overlay {
   position: fixed;
-  inset: 0;
-  z-index: 800; /* Below sidebar and header */
-  background: rgba(15, 23, 42, 0.2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  top: 72px; /* Start below the header */
+  left: var(--sidebar-width); /* Start after the sidebar */
+  right: 0;
+  bottom: 0;
+  z-index: 800; 
+  background: var(--bg-main);
   display: flex;
-  justify-content: flex-end; /* Align to right for a 'drawer' feel or center */
-  align-items: stretch;
-  padding: 0;
+  flex-direction: column;
   overflow: hidden;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Handle collapsed sidebar */
+body:has(.sidebar.collapsed) .modal-overlay {
+  left: var(--sidebar-collapsed);
 }
 
 .modal-content {
   width: 100%;
-  max-width: 100%;
   height: 100%;
-  margin: 0;
-  margin-left: var(--sidebar-width); /* Push content to respect sidebar */
-  margin-top: 64px; /* Push content to respect header */
   background: var(--bg-card);
   display: flex;
   flex-direction: column;
   box-shadow: none;
-  animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .modal-header {
