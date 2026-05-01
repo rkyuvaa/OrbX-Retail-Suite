@@ -85,9 +85,17 @@ function DataTable({ columns, rows, onEdit, onDelete }) {
                                     {c.render ? c.render(row) : (row[c.key] ?? '—')}
                                 </td>
                             ))}
-                            <td style={{ padding: '1rem 1.25rem', textAlign: 'right' }}>
-                                <button className="btn-ghost" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem' }} onClick={() => onEdit(row)}>Edit</button>
-                                <button className="btn-ghost" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', color: 'var(--danger)' }} onClick={() => onDelete(row)}>Delete</button>
+                            <td style={{ padding: '1rem 1.25rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                                <button className="btn-ghost" style={{ 
+                                    padding: '0.35rem 0.85rem', fontSize: '0.78rem', fontWeight: 700,
+                                    borderRadius: '8px', border: '1px solid var(--border)', marginRight: '6px',
+                                    cursor: 'pointer'
+                                }} onClick={() => onEdit(row)}>Edit</button>
+                                <button className="btn-ghost" style={{ 
+                                    padding: '0.35rem 0.85rem', fontSize: '0.78rem', fontWeight: 700,
+                                    borderRadius: '8px', border: '1px solid var(--danger)',
+                                    color: 'var(--danger)', cursor: 'pointer'
+                                }} onClick={() => onDelete(row)}>Delete</button>
                             </td>
                         </tr>
                     ))}
@@ -307,7 +315,21 @@ function RolesTab() {
 
     const columns = [
         { key: 'name', label: 'Role Name', bold: true },
-        { key: 'permissions', label: 'Permissions', render: r => <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)' }}>{JSON.stringify(r.permissions)}</span> },
+        { key: 'permissions', label: 'Permissions', render: r => {
+            const perms = r.permissions || {};
+            const keys = Object.keys(perms);
+            if (keys.length === 0) return <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>No permissions</span>;
+            return (
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {keys.map(k => (
+                        <span key={k} style={{
+                            background: 'var(--primary-light)', color: 'var(--primary)',
+                            borderRadius: '6px', padding: '2px 10px', fontSize: '11px', fontWeight: 700
+                        }}>{k}</span>
+                    ))}
+                </div>
+            );
+        }},
     ];
 
     return (

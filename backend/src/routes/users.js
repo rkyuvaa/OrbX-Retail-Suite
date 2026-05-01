@@ -19,30 +19,15 @@ router.get('/', requireAdmin, async (req, res) => {
     try {
         const { branch_id } = req.query;
         
-        // 1. Check if departments table exists
-        const deptTableCheck = await pool.query("SELECT 1 FROM information_schema.tables WHERE table_name = 'departments'");
-        const hasDepartmentsTable = deptTableCheck.rows.length > 0;
-
-        // 2. Check if department_id column exists in users table (migration safety)
-        const columnCheck = await pool.query(`
-            SELECT 1 FROM information_schema.columns 
-            WHERE table_name = 'users' AND column_name = 'department_id'
-        `);
-        const hasDeptColumn = columnCheck.rows.length > 0;
-
+        // Simple, safe query — no dynamic column checks needed
         let query = `
             SELECT u.id, u.name, u.email, u.is_active, u.is_superadmin,
-                   u.role_id, u.branch_id, 
-                   ${hasDeptColumn ? 'u.department_id,' : ''}
-                   u.allowed_branches, u.allowed_modules, u.created_at,
+                   u.role_id, u.branch_id, u.allowed_branches, u.allowed_modules, u.created_at,
                    r.name as role_name, b.name as branch_name
-                   ${hasDepartmentsTable && hasDeptColumn ? ', d.name as department_name' : ''}
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN branches b ON u.branch_id = b.id
-            ${hasDepartmentsTable && hasDeptColumn ? 'LEFT JOIN departments d ON u.department_id = d.id' : ''}
         `;
-        
         const params = [];
         if (branch_id) {
             query += ` WHERE u.branch_id = $1`;
@@ -53,8 +38,8 @@ router.get('/', requireAdmin, async (req, res) => {
         const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (err) {
-        console.error('CRITICAL ERROR fetching users:', err);
-        res.status(500).json({ error: 'Database mismatch. Please run /setup to update tables.' });
+        console.error('Error fetching users:', err.message);
+        res.status(500).json({ error: err.message });
     }
 });
 

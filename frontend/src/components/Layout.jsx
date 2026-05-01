@@ -101,6 +101,11 @@ export default function Layout({ children }) {
           <button
             className="nav-link w-full border-none bg-transparent cursor-pointer"
             style={{ color: 'var(--danger)' }}
+            onClick={() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              window.location.href = '/login';
+            }}
           >
             <LogOut size={20} />
             {!isCollapsed && <span>Logout</span>}
