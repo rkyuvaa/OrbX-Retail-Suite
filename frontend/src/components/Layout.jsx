@@ -135,61 +135,40 @@ export default function Layout({ children }) {
 
         {/* ─── Header ─── */}
         <header
-          className="glass-panel flex items-center justify-between border-b"
+          className="glass-panel flex items-center justify-between"
           style={{
             position: 'sticky', top: 0, zIndex: 50,
-            padding: '1rem 2.5rem',
+            padding: '0.5rem 2.5rem',
             margin: '-2rem -2.5rem 2rem -2.5rem',
           }}
         >
           {/* Left: hamburger + page title */}
           <div className="flex items-center gap-4">
             <button
-              className="btn btn-ghost p-2"
-              style={{ display: 'none' }}
-              id="mobile-menu-btn"
+              className="btn btn-ghost p-2 md:hidden"
               onClick={() => setIsMobileOpen(true)}
             >
-              <Menu size={22} />
+              <Menu size={20} />
             </button>
             <div>
-              <h2
-                className="text-2xl font-black tracking-tight gradient-text"
-                style={{ lineHeight: 1.1 }}
-              >
+              <h2 className="text-lg font-black tracking-tight text-primary">
                 {pageTitle}
               </h2>
-              <p className="text-sm text-muted" style={{ marginTop: '2px' }}>{pageSubtitle}</p>
             </div>
           </div>
 
-          {/* Right: search + bell + user */}
+          {/* Right: bell + user */}
           <div className="flex items-center gap-3">
-            {/* Search */}
-            <div
-              className="flex items-center gap-3 bg-gray-50 border border-border rounded-xl"
-              style={{ padding: '0.5rem 1rem' }}
-            >
-              <Search size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-              <input
-                style={{
-                  border: 'none', outline: 'none', fontSize: '0.875rem',
-                  width: '200px', background: 'transparent', color: 'var(--text-main)',
-                }}
-                placeholder="Search anything..."
-              />
-            </div>
-
             {/* Bell */}
             <button
               className="btn btn-ghost bg-white border border-border shadow-sm"
-              style={{ position: 'relative', padding: '0.5rem' }}
+              style={{ position: 'relative', padding: '0.4rem' }}
             >
-              <Bell size={18} />
+              <Bell size={16} />
               <span
                 style={{
-                  position: 'absolute', top: '6px', right: '6px',
-                  width: '8px', height: '8px', borderRadius: '50%',
+                  position: 'absolute', top: '4px', right: '4px',
+                  width: '6px', height: '6px', borderRadius: '50%',
                   background: 'var(--danger)', border: '2px solid var(--bg-card)',
                 }}
               />
@@ -197,21 +176,17 @@ export default function Layout({ children }) {
 
             {/* User */}
             <div
-              className="flex items-center gap-3 bg-white border border-border rounded-xl shadow-sm"
-              style={{ padding: '0.4rem 0.9rem 0.4rem 0.4rem' }}
+              className="flex items-center gap-2 bg-white border border-border rounded-lg shadow-sm"
+              style={{ padding: '0.25rem 0.75rem 0.25rem 0.25rem' }}
             >
               <div
-                className="rounded-lg flex items-center justify-center font-black text-white text-sm"
-                style={{
-                  width: '34px', height: '34px', flexShrink: 0,
-                  background: 'linear-gradient(135deg, #0C8500, #085C00)',
-                }}
+                className="rounded flex items-center justify-center font-black text-white text-xs bg-primary"
+                style={{ width: '28px', height: '28px', flexShrink: 0 }}
               >
                 A
               </div>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <p className="text-sm font-bold" style={{ lineHeight: 1.2 }}>Admin User</p>
-                <p className="text-[10px] text-muted font-bold uppercase tracking-wider">Main Branch</p>
+                <p className="text-xs font-bold" style={{ lineHeight: 1.2 }}>Admin</p>
               </div>
             </div>
           </div>

@@ -256,10 +256,9 @@ body {
 .text-white\/80  { color:            rgba(255, 255, 255, 0.80); }
 
 .glass-panel {
-  background:      rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(16px);
-  border-bottom:   1px solid rgba(255, 255, 255, 0.6);
-  box-shadow:      0 4px 24px 0 rgba(0, 0, 0, 0.04);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 [data-theme='dark'] .glass-panel {
   background:    rgba(22, 27, 34, 0.85);
@@ -268,10 +267,7 @@ body {
 
 /* ========== Gradient Utilities ========== */
 .gradient-text {
-  background: linear-gradient(135deg, #0C8500 0%, #13DB00 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary);
 }
 
 .bg-gradient-to-r  { background-image: linear-gradient(to right,  var(--tw-gradient-stops)); }

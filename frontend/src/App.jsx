@@ -20,10 +20,9 @@ function Dashboard() {
         { label: 'Low Stock Items', value: '12', trend: '-2', color: 'var(--warning)' },
         { label: 'Active Transfers', value: '5', trend: 'In Transit', color: 'var(--primary)' },
       ].map((stat, i) => (
-        <div key={i} className="card flex flex-col gap-2 hover:transform hover:-translate-y-1 transition-all duration-300">
-          <span className="text-sm font-bold text-muted uppercase tracking-wider">{stat.label}</span>
-          <span className="text-3xl font-black">{stat.value}</span>
-          <span className="text-xs font-bold" style={{ color: stat.color }}>{stat.trend} from yesterday</span>
+        <div key={i} className="card flex flex-col gap-1 py-4 px-5">
+          <span className="text-[10px] font-black text-muted uppercase tracking-widest">{stat.label}</span>
+          <span className="text-2xl font-black">{stat.value}</span>
         </div>
       ))}
       <div className="col-span-full md:col-span-3 card">

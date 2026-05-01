@@ -122,9 +122,9 @@ export default function POS() {
     : [];
 
   return (
-    <div className="pos-container flex gap-4 h-[calc(100vh-120px)] animate-fade-in">
+    <div className="pos-container flex gap-4 h-[calc(100vh-80px)] animate-fade-in">
       {/* Left: Product Selection */}
-      <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+      <div className="flex-1 flex flex-col gap-3 overflow-hidden">
         <div className="card p-4 flex gap-4 items-center">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={20} />

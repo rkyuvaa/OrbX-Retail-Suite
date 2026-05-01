@@ -62,13 +62,12 @@ export default function Products() {
 
   return (
     <div className="animate-fade-in">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-3xl font-black tracking-tight">Product Master</h2>
-          <p className="text-muted">Manage your catalog and pricing</p>
+          <h2 className="text-2xl font-black tracking-tight">Product Master</h2>
         </div>
-        <button className="btn btn-primary shadow-lg" onClick={() => setShowAddModal(true)}>
-          <Plus size={20} />
+        <button className="btn btn-primary shadow-sm" onClick={() => setShowAddModal(true)}>
+          <Plus size={18} />
           <span>Add Product</span>
         </button>
       </div>
@@ -146,10 +145,9 @@ export default function Products() {
       {showAddModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[2000] flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg animate-slide-up overflow-hidden border border-border">
-            <div style={{background: 'linear-gradient(135deg, #0C8500 0%, #13DB00 100%)'}} className="p-6 text-white flex justify-between items-center">
+            <div className="bg-primary p-4 text-white flex justify-between items-center">
               <div>
-                <h3 className="text-xl font-black">Add New Product</h3>
-                <p className="text-white/80 text-sm font-medium mt-1">Enter product details for inventory</p>
+                <h3 className="text-lg font-black">Add New Product</h3>
               </div>
               <button onClick={() => setShowAddModal(false)} className="hover:bg-white/20 p-2 rounded-xl transition-colors backdrop-blur-sm bg-white/10">
                 <Plus className="rotate-45" size={24}/>
