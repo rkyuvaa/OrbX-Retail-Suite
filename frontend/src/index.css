@@ -1,6 +1,6 @@
 :root {
-  --primary: #6366f1;
-  --primary-hover: #4f46e5;
+  --primary: #10b981;
+  --primary-hover: #059669;
   --bg-main: #f8fafc;
   --bg-card: #ffffff;
   --text-main: #0f172a;
@@ -279,7 +279,7 @@ body {
 .text-white\/80 { color: rgba(255, 255, 255, 0.8); }
 
 .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-.shadow-primary\/30 { box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.39); }
+.shadow-primary\/30 { box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39); }
 
 .glass-panel {
   background: rgba(255, 255, 255, 0.7);
@@ -294,7 +294,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(to right, var(--primary), #a855f7);
+  background: linear-gradient(to right, var(--primary), #34d399);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -303,7 +303,7 @@ body {
   background-image: linear-gradient(to right, var(--tw-gradient-stops));
 }
 .from-primary { --tw-gradient-from: var(--primary); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
-.to-\[\#a855f7\] { --tw-gradient-to: #a855f7; }
+.to-\[\#34d399\] { --tw-gradient-to: #34d399; }
 
 /* Input Focus Premium */
 .input {
@@ -320,7 +320,7 @@ body {
 
 .input:focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
   background: var(--bg-card);
 }
 
