@@ -453,7 +453,7 @@ function UsersTab({ roles, branches, departments }) {
 }
 
 // ─── BRANCHES TAB ────────────────────────────────────────────────────────────
-function BranchesTab() {
+function BranchesTab({ onUpdate }) {
     const [items, setItems] = useState([]);
     const [modal, setModal] = useState(null);
     const [form, setForm] = useState({});
@@ -469,14 +469,23 @@ function BranchesTab() {
         const r = await apiFetch(isEdit ? `/api/branches/${modal.edit.id}` : '/api/branches', {
             method: isEdit ? 'PUT' : 'POST', body: JSON.stringify(form)
         });
-        if (r.ok) { toast.success(isEdit ? 'Updated' : 'Created'); setModal(null); load(); }
+        if (r.ok) { 
+            toast.success(isEdit ? 'Updated' : 'Created'); 
+            setModal(null); 
+            load(); 
+            if (onUpdate) onUpdate();
+        }
         else { const d = await r.json(); toast.error(d.error || 'Failed'); }
     };
 
     const remove = async (row) => {
         if (!confirm(`Delete branch "${row.name}"?`)) return;
         const r = await apiFetch(`/api/branches/${row.id}`, { method: 'DELETE' });
-        if (r.ok) { toast.success('Deleted'); load(); } else toast.error('Failed');
+        if (r.ok) { 
+            toast.success('Deleted'); 
+            load(); 
+            if (onUpdate) onUpdate();
+        }
     };
 
     const columns = [
@@ -517,7 +526,7 @@ function BranchesTab() {
 }
 
 // ─── ROLES TAB ───────────────────────────────────────────────────────────────
-function RolesTab() {
+function RolesTab({ onUpdate }) {
     const [items, setItems] = useState([]);
     const [modal, setModal] = useState(null);
     const [form, setForm] = useState({});
@@ -535,14 +544,23 @@ function RolesTab() {
         const r = await apiFetch(isEdit ? `/api/roles/${modal.edit.id}` : '/api/roles', {
             method: isEdit ? 'PUT' : 'POST', body: JSON.stringify({ name: form.name, permissions })
         });
-        if (r.ok) { toast.success(isEdit ? 'Updated' : 'Created'); setModal(null); load(); }
+        if (r.ok) { 
+            toast.success(isEdit ? 'Updated' : 'Created'); 
+            setModal(null); 
+            load(); 
+            if (onUpdate) onUpdate();
+        }
         else { const d = await r.json(); toast.error(d.error || 'Failed'); }
     };
 
     const remove = async (row) => {
         if (!confirm(`Delete role "${row.name}"?`)) return;
         const r = await apiFetch(`/api/roles/${row.id}`, { method: 'DELETE' });
-        if (r.ok) { toast.success('Deleted'); load(); } else toast.error('Failed');
+        if (r.ok) { 
+            toast.success('Deleted'); 
+            load(); 
+            if (onUpdate) onUpdate();
+        }
     };
 
     const columns = [
@@ -593,7 +611,7 @@ function RolesTab() {
 }
 
 // ─── DEPARTMENTS TAB ──────────────────────────────────────────────────────────
-function DepartmentsTab() {
+function DepartmentsTab({ onUpdate }) {
     const [items, setItems] = useState([]);
     const [modal, setModal] = useState(null);
     const [form, setForm] = useState({});
@@ -609,14 +627,23 @@ function DepartmentsTab() {
         const r = await apiFetch(isEdit ? `/api/departments/${modal.edit.id}` : '/api/departments', {
             method: isEdit ? 'PUT' : 'POST', body: JSON.stringify({ name: form.name })
         });
-        if (r.ok) { toast.success(isEdit ? 'Updated' : 'Created'); setModal(null); load(); }
+        if (r.ok) { 
+            toast.success(isEdit ? 'Updated' : 'Created'); 
+            setModal(null); 
+            load(); 
+            if (onUpdate) onUpdate();
+        }
         else { const d = await r.json(); toast.error(d.error || 'Failed'); }
     };
 
     const remove = async (row) => {
         if (!confirm(`Delete department "${row.name}"?`)) return;
         const r = await apiFetch(`/api/departments/${row.id}`, { method: 'DELETE' });
-        if (r.ok) { toast.success('Deleted'); load(); } else toast.error('Failed');
+        if (r.ok) { 
+            toast.success('Deleted'); 
+            load(); 
+            if (onUpdate) onUpdate();
+        }
     };
 
     const columns = [
@@ -792,9 +819,9 @@ export default function Settings() {
             <div className="card" style={{ padding: 20 }}>
                 {activeTab === 'users'        && <UsersTab roles={roles} branches={branches} departments={departments} />}
                 {activeTab === 'salespersons' && <SalesPersonsTab branches={branches} />}
-                {activeTab === 'branches'     && <BranchesTab />}
-                {activeTab === 'roles'        && <RolesTab />}
-                {activeTab === 'departments'  && <DepartmentsTab />}
+                {activeTab === 'branches'     && <BranchesTab onUpdate={() => apiFetch('/api/branches').then(r => r.ok && r.json()).then(d => d && setBranches(d))} />}
+                {activeTab === 'roles'        && <RolesTab onUpdate={() => apiFetch('/api/roles').then(r => r.ok && r.json()).then(d => d && setRoles(d))} />}
+                {activeTab === 'departments'  && <DepartmentsTab onUpdate={() => apiFetch('/api/departments').then(r => r.ok && r.json()).then(d => d && setDepartments(d))} />}
             </div>
         </div>
     );
