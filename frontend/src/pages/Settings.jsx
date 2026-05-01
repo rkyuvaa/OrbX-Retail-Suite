@@ -39,7 +39,7 @@ function Modal({ title, onClose, children, footer }) {
 
 function FormField({ label, children }) {
     return (
-        <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ marginBottom: '1rem' }}>
             <label style={{ 
                 display: 'block', 
                 fontSize: '11px', 
