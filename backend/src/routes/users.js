@@ -18,16 +18,20 @@ function requireAdmin(req, res, next) {
 router.get('/', requireAdmin, async (req, res) => {
     try {
         const { branch_id } = req.query;
+        // Check if departments table exists first to avoid crash
+        const tableCheck = await pool.query("SELECT 1 FROM information_schema.tables WHERE table_name = 'departments'");
+        const hasDepartments = tableCheck.rows.length > 0;
+
         let query = `
             SELECT u.id, u.name, u.email, u.is_active, u.is_superadmin,
                    u.role_id, u.branch_id, u.department_id,
                    u.allowed_branches, u.allowed_modules, u.created_at,
-                   r.name as role_name, b.name as branch_name,
-                   d.name as department_name
+                   r.name as role_name, b.name as branch_name
+                   ${hasDepartments ? ', d.name as department_name' : ''}
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN branches b ON u.branch_id = b.id
-            LEFT JOIN departments d ON u.department_id = d.id
+            ${hasDepartments ? 'LEFT JOIN departments d ON u.department_id = d.id' : ''}
         `;
         const params = [];
         if (branch_id) {
@@ -38,7 +42,8 @@ router.get('/', requireAdmin, async (req, res) => {
         const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error fetching users:', err);
+        res.status(500).json({ error: 'Database error. Did you run /setup?' });
     }
 });
 

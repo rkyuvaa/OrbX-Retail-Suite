@@ -16,10 +16,14 @@ function requireAdmin(req, res, next) {
 // GET /api/departments
 router.get('/', requireAdmin, async (req, res) => {
     try {
+        const tableCheck = await pool.query("SELECT 1 FROM information_schema.tables WHERE table_name = 'departments'");
+        if (tableCheck.rows.length === 0) return res.json([]);
+        
         const result = await pool.query('SELECT * FROM departments ORDER BY id ASC');
         res.json(result.rows);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error fetching departments:', err);
+        res.json([]); // Return empty list instead of crashing
     }
 });
 
