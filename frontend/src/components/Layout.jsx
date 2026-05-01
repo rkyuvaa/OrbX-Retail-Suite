@@ -1,120 +1,216 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, ShoppingCart, Package, ArrowLeftRight, 
-  Users, BarChart3, Settings, Menu, X, ChevronLeft, 
-  LogOut, Bell, Search, Sun, Moon 
+  Users, BarChart3, Settings, Menu, ChevronLeft, 
+  LogOut, Bell, Search, Sun, Moon, Warehouse
 } from 'lucide-react';
 import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 
 const navItems = [
-  { path: '/', name: 'Dashboard', icon: LayoutDashboard },
-  { path: '/pos', name: 'POS / Billing', icon: ShoppingCart },
-  { path: '/products', name: 'Products', icon: Package },
-  { path: '/inventory', name: 'Inventory', icon: BarChart3 },
-  { path: '/transfers', name: 'Transfers', icon: ArrowLeftRight },
-  { path: '/customers', name: 'Customers', icon: Users },
-  { path: '/reports', name: 'Reports', icon: BarChart3 },
-  { path: '/settings', name: 'Settings', icon: Settings },
+  { path: '/',           name: 'Dashboard',    icon: LayoutDashboard },
+  { path: '/pos',        name: 'POS / Billing', icon: ShoppingCart   },
+  { path: '/products',   name: 'Products',      icon: Package        },
+  { path: '/inventory',  name: 'Inventory',     icon: BarChart3      },
+  { path: '/transfers',  name: 'Transfers',     icon: ArrowLeftRight },
+  { path: '/customers',  name: 'Customers',     icon: Users          },
+  { path: '/reports',    name: 'Reports',       icon: BarChart3      },
+  { path: '/settings',   name: 'Settings',      icon: Settings       },
 ];
 
+const pageSubtitles = {
+  '/':          'Overview of your retail operations',
+  '/pos':       'Fast billing with barcode support',
+  '/products':  'Manage your catalog and pricing',
+  '/inventory': 'Track stock across all branches',
+  '/transfers': 'Manage inter-branch stock movement',
+  '/customers': 'Customer records and credit accounts',
+  '/reports':   'Sales and performance analytics',
+  '/settings':  'Configure your ERP settings',
+};
+
 export default function Layout({ children }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed]   = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  
+  const [isDarkMode, setIsDarkMode]     = useState(false);
+  const location = useLocation();
+
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.setAttribute('data-theme', !isDarkMode ? 'dark' : 'light');
+    const next = !isDarkMode;
+    setIsDarkMode(next);
+    document.documentElement.setAttribute('data-theme', next ? 'dark' : 'light');
   };
+
+  // Derive current page title from route
+  const currentNav  = navItems.find(n => n.path === location.pathname) || navItems[0];
+  const pageTitle   = currentNav.name;
+  const pageSubtitle = pageSubtitles[location.pathname] || 'OrbX Retail ERP';
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar Overlay (Mobile) */}
+      {/* Mobile Overlay */}
       {isMobileOpen && (
-        <div className="fixed inset-0 bg-black/50 z-[999] md:hidden" onClick={() => setIsMobileOpen(false)} />
+        <div
+          className="fixed inset-0 z-[999]"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setIsMobileOpen(false)}
+        />
       )}
 
-      {/* Sidebar */}
-      <aside className={clsx(
-        'sidebar',
-        isCollapsed && 'collapsed',
-        isMobileOpen && 'mobile-open'
-      )}>
+      {/* ─── Sidebar ─── */}
+      <aside className={clsx('sidebar', isCollapsed && 'collapsed', isMobileOpen && 'mobile-open')}>
+
+        {/* Logo */}
         <div className="flex items-center gap-3 px-2 mb-8">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
-            <Package size={24} />
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white flex-shrink-0"
+            style={{ background: 'linear-gradient(135deg, #13DB00, #009900)' }}
+          >
+            <Package size={22} />
           </div>
           {!isCollapsed && (
-            <div className="animate-fade-in">
-              <h1 className="font-black text-xl tracking-tight">ORBX ERP</h1>
-              <p className="text-[10px] text-muted font-bold tracking-widest uppercase">Retail Suite</p>
+            <div className="animate-fade-in overflow-hidden">
+              <h1 className="font-black text-lg tracking-tight leading-none">ORBX ERP</h1>
+              <p className="text-[10px] text-muted font-bold tracking-widest uppercase mt-0.5">Retail Suite</p>
             </div>
           )}
         </div>
 
-        <nav className="flex-1 flex flex-col gap-1">
+        {/* Nav */}
+        <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
+              end={item.path === '/'}
               className={({ isActive }) => clsx('nav-link', isActive && 'active')}
               onClick={() => setIsMobileOpen(false)}
             >
-              <item.icon size={20} />
+              <item.icon size={20} style={{ flexShrink: 0 }} />
               {!isCollapsed && <span>{item.name}</span>}
             </NavLink>
           ))}
         </nav>
 
-        <div className="mt-auto flex flex-col gap-2">
+        {/* Bottom Actions */}
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           <button className="nav-link w-full border-none bg-transparent cursor-pointer" onClick={toggleDarkMode}>
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             {!isCollapsed && <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>}
           </button>
-          <button className="nav-link w-full border-none bg-transparent cursor-pointer text-danger hover:bg-danger/10">
+          <button
+            className="nav-link w-full border-none bg-transparent cursor-pointer"
+            style={{ color: 'var(--danger)' }}
+          >
             <LogOut size={20} />
             {!isCollapsed && <span>Logout</span>}
           </button>
         </div>
 
         {/* Collapse Toggle (Desktop) */}
-        <button 
-          className="absolute -right-3 top-20 bg-white border border-border w-6 h-6 rounded-full hidden md:flex items-center justify-center text-muted hover:text-primary transition-all shadow-sm"
+        <button
+          style={{
+            position: 'absolute', right: '-12px', top: '76px',
+            width: '24px', height: '24px', borderRadius: '50%',
+            background: 'var(--bg-card)', border: '1px solid var(--border)',
+            display: 'none', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', boxShadow: 'var(--shadow-sm)', zIndex: 10,
+          }}
+          className="md:flex"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
-          <ChevronLeft size={14} className={clsx(isCollapsed && 'rotate-180')} />
+          <ChevronLeft
+            size={13}
+            style={{
+              color: 'var(--text-muted)',
+              transform: isCollapsed ? 'rotate(180deg)' : 'none',
+              transition: 'transform 0.25s ease',
+            }}
+          />
         </button>
       </aside>
 
-      {/* Main Content */}
+      {/* ─── Main Content ─── */}
       <main className={clsx('main-content flex-1', isCollapsed && 'sidebar-collapsed')}>
-        {/* Top Header */}
-        <header className="flex items-center justify-between mb-8 sticky top-0 glass-panel z-50 py-4 border-b border-border -mx-8 px-8 transition-all">
+
+        {/* ─── Header ─── */}
+        <header
+          className="glass-panel flex items-center justify-between border-b"
+          style={{
+            position: 'sticky', top: 0, zIndex: 50,
+            padding: '1rem 2.5rem',
+            margin: '-2rem -2.5rem 2rem -2.5rem',
+          }}
+        >
+          {/* Left: hamburger + page title */}
           <div className="flex items-center gap-4">
-            <button className="md:hidden btn btn-ghost p-2" onClick={() => setIsMobileOpen(true)}>
-              <Menu size={24} />
+            <button
+              className="btn btn-ghost p-2"
+              style={{ display: 'none' }}
+              id="mobile-menu-btn"
+              onClick={() => setIsMobileOpen(true)}
+            >
+              <Menu size={22} />
             </button>
             <div>
-              <h2 className="text-2xl font-black tracking-tight gradient-text">Dashboard</h2>
-              <p className="text-sm text-muted font-medium">Welcome back, Admin</p>
+              <h2
+                className="text-2xl font-black tracking-tight gradient-text"
+                style={{ lineHeight: 1.1 }}
+              >
+                {pageTitle}
+              </h2>
+              <p className="text-sm text-muted" style={{ marginTop: '2px' }}>{pageSubtitle}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden lg:flex items-center gap-3 bg-gray-50 border border-border px-4 py-2 rounded-xl focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                <Search size={18} className="text-muted" />
-                <input className="border-none outline-none text-sm w-64 bg-transparent" placeholder="Search anything..." />
+          {/* Right: search + bell + user */}
+          <div className="flex items-center gap-3">
+            {/* Search */}
+            <div
+              className="flex items-center gap-3 bg-gray-50 border border-border rounded-xl"
+              style={{ padding: '0.5rem 1rem' }}
+            >
+              <Search size={16} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+              <input
+                style={{
+                  border: 'none', outline: 'none', fontSize: '0.875rem',
+                  width: '200px', background: 'transparent', color: 'var(--text-main)',
+                }}
+                placeholder="Search anything..."
+              />
             </div>
-            <button className="btn btn-ghost relative p-2 bg-white border border-border shadow-sm hover:bg-gray-50">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full border-2 border-white" />
+
+            {/* Bell */}
+            <button
+              className="btn btn-ghost bg-white border border-border shadow-sm"
+              style={{ position: 'relative', padding: '0.5rem' }}
+            >
+              <Bell size={18} />
+              <span
+                style={{
+                  position: 'absolute', top: '6px', right: '6px',
+                  width: '8px', height: '8px', borderRadius: '50%',
+                  background: 'var(--danger)', border: '2px solid var(--bg-card)',
+                }}
+              />
             </button>
-            <div className="flex items-center gap-3 bg-white border border-border p-1.5 pr-4 rounded-xl shadow-sm">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold">A</div>
-              <div className="hidden sm:flex flex-col justify-center">
-                <p className="text-sm font-bold leading-tight">Admin User</p>
+
+            {/* User */}
+            <div
+              className="flex items-center gap-3 bg-white border border-border rounded-xl shadow-sm"
+              style={{ padding: '0.4rem 0.9rem 0.4rem 0.4rem' }}
+            >
+              <div
+                className="rounded-lg flex items-center justify-center font-black text-white text-sm"
+                style={{
+                  width: '34px', height: '34px', flexShrink: 0,
+                  background: 'linear-gradient(135deg, #13DB00, #009900)',
+                }}
+              >
+                A
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <p className="text-sm font-bold" style={{ lineHeight: 1.2 }}>Admin User</p>
                 <p className="text-[10px] text-muted font-bold uppercase tracking-wider">Main Branch</p>
               </div>
             </div>
@@ -122,9 +218,7 @@ export default function Layout({ children }) {
         </header>
 
         {/* Page Body */}
-        <div className="page-body">
-          {children}
-        </div>
+        <div>{children}</div>
       </main>
     </div>
   );
