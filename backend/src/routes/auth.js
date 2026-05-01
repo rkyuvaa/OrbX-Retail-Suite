@@ -13,35 +13,128 @@ router.post('/setup', async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // Check if already setup
+        // Step 1: Create tables if they don't exist
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS roles (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(50) UNIQUE NOT NULL,
+                permissions JSONB DEFAULT '{}'
+            );
+            CREATE TABLE IF NOT EXISTS branches (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                location TEXT,
+                is_warehouse BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS users (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                role_id INTEGER REFERENCES roles(id),
+                branch_id INTEGER REFERENCES branches(id),
+                allowed_branches JSONB DEFAULT '[]',
+                allowed_modules JSONB DEFAULT '[]',
+                is_superadmin BOOLEAN DEFAULT FALSE,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS products (
+                id SERIAL PRIMARY KEY,
+                sku VARCHAR(50) UNIQUE NOT NULL,
+                barcode VARCHAR(100) UNIQUE,
+                name VARCHAR(200) NOT NULL,
+                category VARCHAR(100),
+                price DECIMAL(12, 2) NOT NULL,
+                tax_percent DECIMAL(5, 2) DEFAULT 0,
+                min_stock_level INTEGER DEFAULT 5,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS inventory (
+                id SERIAL PRIMARY KEY,
+                branch_id INTEGER REFERENCES branches(id),
+                product_id INTEGER REFERENCES products(id),
+                quantity INTEGER DEFAULT 0,
+                last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(branch_id, product_id)
+            );
+            CREATE TABLE IF NOT EXISTS sales (
+                id SERIAL PRIMARY KEY,
+                branch_id INTEGER REFERENCES branches(id),
+                user_id INTEGER REFERENCES users(id),
+                customer_name VARCHAR(100),
+                customer_mobile VARCHAR(20),
+                total_amount DECIMAL(12, 2) NOT NULL,
+                tax_amount DECIMAL(12, 2) NOT NULL,
+                discount_amount DECIMAL(12, 2) DEFAULT 0,
+                payment_method VARCHAR(50),
+                offline_id VARCHAR(100) UNIQUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS sale_items (
+                id SERIAL PRIMARY KEY,
+                sale_id INTEGER REFERENCES sales(id),
+                product_id INTEGER REFERENCES products(id),
+                quantity INTEGER NOT NULL,
+                unit_price DECIMAL(12, 2) NOT NULL,
+                tax_amount DECIMAL(12, 2) NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS transfers (
+                id SERIAL PRIMARY KEY,
+                from_branch_id INTEGER REFERENCES branches(id),
+                to_branch_id INTEGER REFERENCES branches(id),
+                status VARCHAR(50) DEFAULT 'Pending',
+                created_by INTEGER REFERENCES users(id),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                received_at TIMESTAMP
+            );
+            CREATE TABLE IF NOT EXISTS transfer_items (
+                id SERIAL PRIMARY KEY,
+                transfer_id INTEGER REFERENCES transfers(id),
+                product_id INTEGER REFERENCES products(id),
+                quantity INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS sync_log (
+                id SERIAL PRIMARY KEY,
+                branch_id INTEGER REFERENCES branches(id),
+                sync_type VARCHAR(50),
+                data JSONB,
+                status VARCHAR(20) DEFAULT 'SUCCESS',
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        // Step 2: Check if already setup
         const userCount = await client.query('SELECT COUNT(*) FROM users');
         if (parseInt(userCount.rows[0].count) > 0) {
+            await client.query('ROLLBACK');
             return res.status(400).json({ error: 'System already initialized' });
         }
 
-        // 1. Create Default Roles
+        // Step 3: Create Default Roles
         const adminRole = await client.query(
             "INSERT INTO roles (name, permissions) VALUES ($1, $2) RETURNING id",
             ['Administrator', JSON.stringify({ all: true })]
         );
-        const warehouseRole = await client.query(
+        await client.query(
             "INSERT INTO roles (name, permissions) VALUES ($1, $2) RETURNING id",
             ['Warehouse Manager', JSON.stringify({ warehouse: true, inventory: true })]
         );
-        const branchRole = await client.query(
+        await client.query(
             "INSERT INTO roles (name, permissions) VALUES ($1, $2) RETURNING id",
             ['Branch User', JSON.stringify({ pos: true, inventory: true })]
         );
 
-        // 2. Create Default HQ Branch
+        // Step 4: Create Default HQ Branch
         const hqBranch = await client.query(
             "INSERT INTO branches (name, location, is_warehouse) VALUES ($1, $2, $3) RETURNING id",
             ['Head Office & Warehouse', 'Main City', true]
         );
 
-        // 3. Create Superadmin User
+        // Step 5: Create Superadmin User
         const hashedPassword = await hashPassword('admin123');
-        const adminUser = await client.query(
+        await client.query(
             `INSERT INTO users (name, email, password_hash, role_id, branch_id, is_superadmin, allowed_modules)
              VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
             [
@@ -62,6 +155,7 @@ router.post('/setup', async (req, res) => {
         });
     } catch (error) {
         await client.query('ROLLBACK');
+        console.error('Setup error:', error);
         res.status(500).json({ error: 'Setup failed', details: error.message });
     } finally {
         client.release();
