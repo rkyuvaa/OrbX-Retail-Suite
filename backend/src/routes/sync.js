@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { Pool } = require('pg');
-const pool = new Pool(); // Configured via env variables
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
+});
 
 router.post('/', async (req, res) => {
     const { branch_id, records } = req.body;
@@ -47,6 +49,15 @@ router.post('/', async (req, res) => {
                                 [item.quantity, branch_id, item.product_id]
                             );
                         }
+                    }
+                } else if (record.type === 'PRODUCT_ADD') {
+                    // Check if SKU already exists
+                    const existing = await client.query('SELECT id FROM products WHERE sku = $1', [record.data.sku]);
+                    if (existing.rows.length === 0) {
+                        await client.query(
+                            'INSERT INTO products (sku, barcode, name, category, price, tax_percent, min_stock_level) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                            [record.data.sku, record.data.barcode, record.data.name, record.data.category, record.data.price, record.data.tax_percent, record.data.min_stock_level]
+                        );
                     }
                 }
                 results.success.push(record.id);
