@@ -38,7 +38,29 @@
   --bg-card:   #1e293b;
   --text-main: #f1f5f9;
   --text-muted:#94a3b8;
-  --border:    #334155;
+  --border:    rgba(255, 255, 255, 0.08);
+  --primary-light: rgba(12, 133, 0, 0.15);
+}
+
+/* Fix blinding highlights in dark mode */
+[data-theme='dark'] tr:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+[data-theme='dark'] .modal-content,
+[data-theme='dark'] .modal-header,
+[data-theme='dark'] .modal-footer {
+  background: #1e293b;
+  color: #f1f5f9;
+}
+
+[data-theme='dark'] .modal-footer {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .btn-ghost {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
 }
 
 /* ========== Reset ========== */
@@ -525,6 +547,8 @@ th, td   { text-align: left; }
 .transition-colors { transition: color 0.2s ease, background-color 0.2s ease; }
 .transition-all    { transition: all 0.2s ease; }
 .hover\:bg-gray-50:hover  { background-color: #f9fafb; }
+[data-theme='dark'] .hover\:bg-gray-50:hover { background-color: rgba(255, 255, 255, 0.05); }
+
 .hover\:bg-primary\/10:hover { background-color: var(--primary-light); }
 .hover\:bg-danger\/10:hover  { background-color: rgba(239, 68, 68, 0.1); }
 .hover\:bg-white\/20:hover   { background-color: rgba(255, 255, 255, 0.2); }
