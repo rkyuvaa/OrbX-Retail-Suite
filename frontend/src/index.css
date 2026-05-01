@@ -3,7 +3,7 @@
    Brand Color: #02b30e (Green)
    =========================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
   --primary:        #0C8500;
@@ -11,6 +11,9 @@
   --primary-light:  rgba(12, 133, 0, 0.08);
   --primary-glow:   rgba(12, 133, 0, 0.15);
   --primary-dark:   #085C00;
+
+  --font-main:      'Outfit', sans-serif;
+  --font-display:   'Outfit', sans-serif;
 
   --bg-main:        #f8fafc;
   --bg-card:        #ffffff;
@@ -42,7 +45,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: var(--font-main);
   background-color: var(--bg-main);
   color: var(--text-main);
   overflow-x: hidden;
@@ -50,10 +53,10 @@ body {
   line-height: 1.6;
 }
 
-h1, h2, h3, h4, h5, .font-heading {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+h1, h2, h3, h4, h5, .font-heading, button, input, select, textarea {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 /* ========== Flexbox / Grid ========== */
