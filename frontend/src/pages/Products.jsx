@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, queueForSync } from '../utils/db';
-import { Package, Plus, Search, Filter, Edit3, Trash2, Tag, Barcode, IndianRupee } from 'lucide-react';
+import { Package, Plus, Search, Filter, Edit3, Trash2, Tag, Scan, CreditCard } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 export default function Products() {
@@ -102,7 +102,7 @@ export default function Products() {
                 <td className="px-6 py-4">
                   <div className="flex flex-col gap-1">
                     <span className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded w-fit">{p.sku}</span>
-                    <span className="text-[10px] text-muted flex items-center gap-1"><Barcode size={10}/> {p.barcode || 'N/A'}</span>
+                    <span className="text-[10px] text-muted flex items-center gap-1"><Scan size={10}/> {p.barcode || 'N/A'}</span>
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm font-bold text-muted">{p.category}</td>
