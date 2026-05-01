@@ -6,11 +6,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --primary:        #13DB00;
-  --primary-hover:  #10c000;
-  --primary-light:  rgba(19, 219, 0, 0.1);
-  --primary-glow:   rgba(19, 219, 0, 0.22);
-  --primary-dark:   #0a9200;
+  --primary:        #0C8500;
+  --primary-hover:  #0A7000;
+  --primary-light:  rgba(12, 133, 0, 0.1);
+  --primary-glow:   rgba(12, 133, 0, 0.22);
+  --primary-dark:   #085C00;
 
   --bg-main:        #f4f6f9;
   --bg-card:        #ffffff;
@@ -162,7 +162,7 @@ body {
 /* ========== Backgrounds & Borders ========== */
 .bg-primary      { background-color: var(--primary); }
 .bg-primary\/10  { background-color: var(--primary-light); }
-.bg-success\/10  { background-color: rgba(19, 219, 0, 0.1); }
+.bg-success\/10  { background-color: rgba(12, 133, 0, 0.1); }
 .bg-danger\/10   { background-color: rgba(239, 68, 68, 0.1); }
 .bg-warning\/10  { background-color: rgba(245, 158, 11, 0.1); }
 .bg-transparent  { background-color: transparent; }
@@ -190,7 +190,7 @@ body {
 .shadow     { box-shadow: var(--shadow);    }
 .shadow-lg  { box-shadow: var(--shadow-lg); }
 .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-.shadow-primary\/30 { box-shadow: 0 4px 20px 0 rgba(19, 219, 0, 0.35); }
+.shadow-primary\/30 { box-shadow: 0 4px 20px 0 rgba(12, 133, 0, 0.35); }
 
 .overflow-hidden  { overflow: hidden; }
 .overflow-x-auto  { overflow-x: auto; }
@@ -268,7 +268,7 @@ body {
 
 /* ========== Gradient Utilities ========== */
 .gradient-text {
-  background: linear-gradient(135deg, #13DB00 0%, #00ff22 100%);
+  background: linear-gradient(135deg, #0C8500 0%, #13DB00 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

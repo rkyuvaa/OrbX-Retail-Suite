@@ -64,7 +64,7 @@ export default function Layout({ children }) {
         <div className="flex items-center gap-3 px-2 mb-8">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center text-white flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #13DB00, #009900)' }}
+            style={{ background: 'linear-gradient(135deg, #0C8500, #085C00)' }}
           >
             <Package size={22} />
           </div>
@@ -204,7 +204,7 @@ export default function Layout({ children }) {
                 className="rounded-lg flex items-center justify-center font-black text-white text-sm"
                 style={{
                   width: '34px', height: '34px', flexShrink: 0,
-                  background: 'linear-gradient(135deg, #13DB00, #009900)',
+                  background: 'linear-gradient(135deg, #0C8500, #085C00)',
                 }}
               >
                 A

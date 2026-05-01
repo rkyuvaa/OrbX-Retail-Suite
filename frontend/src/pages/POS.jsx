@@ -17,6 +17,18 @@ export default function POS() {
     searchRef.current?.focus();
   }, []);
 
+  // Barcode Auto-add Logic
+  useEffect(() => {
+    if (search.length > 3) {
+      const product = products.find(p => p.barcode === search);
+      if (product) {
+        addToCart(product);
+        setSearch('');
+        toast.success(`Added ${product.name}`);
+      }
+    }
+  }, [search, products]);
+
   const loadProducts = async () => {
     const all = await db.products.toArray();
     setProducts(all);
@@ -160,11 +172,11 @@ export default function POS() {
       {/* Right: Cart & Checkout */}
       <div className="w-[400px] flex flex-col gap-4">
         <div className="card p-4 flex flex-col gap-4 flex-1 overflow-hidden">
-          <div className="flex items-center justify-between border-bottom pb-2">
+          <div className="flex items-center justify-between border-b pb-2">
             <div className="flex items-center gap-2 font-bold">
               <ShoppingCart size={20} className="text-primary" /> Current Cart
             </div>
-            <button className="btn btn-ghost btn-sm text-danger" onClick={() => setCart([])}>Clear</button>
+            <button className="btn btn-ghost py-1 px-3 text-xs text-danger hover:bg-danger/10" onClick={() => setCart([])}>Clear</button>
           </div>
 
           <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">

@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 export const db = new Dexie('OrbxRetailERP');
 
 db.version(1).stores({
-  products: 'id, sku, barcode, name, category, price',
+  products: '++id, sku, barcode, name, category, price',
   inventory: '++id, branch_id, product_id, quantity, last_updated',
   sales: '++id, offline_id, customer_name, total_amount, synced',
   syncQueue: '++id, type, data, status, timestamp'
