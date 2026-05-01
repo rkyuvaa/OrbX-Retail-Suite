@@ -120,12 +120,9 @@ router.post('/setup', async (req, res) => {
             ALTER TABLE users ADD COLUMN IF NOT EXISTS is_superadmin BOOLEAN DEFAULT FALSE;
         `);
 
-        // Step 2: Check if already setup
+        // Step 2: (Optional) Check count for logging
         const userCount = await client.query('SELECT COUNT(*) FROM users');
-        if (parseInt(userCount.rows[0].count) > 0) {
-            await client.query('ROLLBACK');
-            return res.status(400).json({ error: 'System already initialized' });
-        }
+        console.log(`Current user count: ${userCount.rows[0].count}`);
 
         // Step 3: Create Default Roles (Upsert)
         const adminRole = await client.query(
@@ -162,7 +159,12 @@ router.post('/setup', async (req, res) => {
         await client.query(
             `INSERT INTO users (name, email, password_hash, role_id, branch_id, is_superadmin, allowed_modules)
              VALUES ($1, $2, $3, $4, $5, $6, $7) 
-             ON CONFLICT (email) DO NOTHING`,
+             ON CONFLICT (email) DO UPDATE SET 
+                password_hash = EXCLUDED.password_hash,
+                role_id = EXCLUDED.role_id,
+                branch_id = EXCLUDED.branch_id,
+                is_superadmin = EXCLUDED.is_superadmin,
+                allowed_modules = EXCLUDED.allowed_modules`,
             [
                 'Admin', 
                 'admin@orbx.com', 
