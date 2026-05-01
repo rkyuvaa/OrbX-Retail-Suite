@@ -183,42 +183,38 @@ function UsersTab({ roles, branches, departments }) {
                     <FormField label={modal?.edit ? 'New Password (Optional)' : 'Password'}>
                         <input className="input" type="password" value={form.password || ''} onChange={e => setForm({ ...form, password: e.target.value })} placeholder="••••••••" />
                     </FormField>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <FormField label="Role">
-                            <select className="input" value={form.role_id || ''} onChange={e => setForm({ ...form, role_id: e.target.value || null })}>
-                                <option value="">Select Role</option>
-                                {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-                            </select>
-                        </FormField>
-                        <FormField label="Branch">
-                            <select className="input" value={form.branch_id || ''} onChange={e => setForm({ ...form, branch_id: e.target.value || null })}>
-                                <option value="">Select Branch</option>
-                                {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                            </select>
-                        </FormField>
-                    </div>
+                    <FormField label="Role">
+                        <select className="input" value={form.role_id || ''} onChange={e => setForm({ ...form, role_id: e.target.value || null })}>
+                            <option value="">Select Role</option>
+                            {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+                        </select>
+                    </FormField>
+                    <FormField label="Branch">
+                        <select className="input" value={form.branch_id || ''} onChange={e => setForm({ ...form, branch_id: e.target.value || null })}>
+                            <option value="">Select Branch</option>
+                            {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                        </select>
+                    </FormField>
                     <FormField label="Department">
                         <select className="input" value={form.department_id || ''} onChange={e => setForm({ ...form, department_id: e.target.value || null })}>
                             <option value="">Select Department</option>
                             {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                         </select>
                     </FormField>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <FormField label="Is Superadmin?">
-                            <select className="input" value={form.is_superadmin ? 'true' : 'false'} onChange={e => setForm({ ...form, is_superadmin: e.target.value === 'true' })}>
-                                <option value="false">No (Standard User)</option>
-                                <option value="true">Yes (Full Access)</option>
+                    <FormField label="Is Superadmin?">
+                        <select className="input" value={form.is_superadmin ? 'true' : 'false'} onChange={e => setForm({ ...form, is_superadmin: e.target.value === 'true' })}>
+                            <option value="false">No (Standard User)</option>
+                            <option value="true">Yes (Full Access)</option>
+                        </select>
+                    </FormField>
+                    {modal?.edit && (
+                        <FormField label="Account Status">
+                            <select className="input" value={form.is_active ? 'true' : 'false'} onChange={e => setForm({ ...form, is_active: e.target.value === 'true' })}>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
                             </select>
                         </FormField>
-                        {modal?.edit && (
-                            <FormField label="Account Status">
-                                <select className="input" value={form.is_active ? 'true' : 'false'} onChange={e => setForm({ ...form, is_active: e.target.value === 'true' })}>
-                                    <option value="true">Active</option>
-                                    <option value="false">Inactive</option>
-                                </select>
-                            </FormField>
-                        )}
-                    </div>
+                    )}
                 </Modal>
             )}
         </>
