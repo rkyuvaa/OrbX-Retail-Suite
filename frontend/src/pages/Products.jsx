@@ -31,26 +31,38 @@ export default function Products() {
         min_stock_level: parseInt(formData.min_stock_level)
       };
 
+      // Check for duplicate SKU in IndexedDB
+      const existing = await db.products.where('sku').equals(newProduct.sku).first();
+      if (existing) {
+        toast.error('A product with this SKU already exists');
+        return;
+      }
+
       // Add to IndexedDB first (Offline-first)
       const id = await db.products.add(newProduct);
 
-      // Initialize inventory for this branch (Mock Branch 1)
-      await db.inventory.add({
-        branch_id: 1,
-        product_id: id,
-        quantity: 100, // Starting stock for testing
-        last_updated: new Date().toISOString()
-      });
+      // Initialize inventory — check if it already exists first
+      const existingInv = await db.inventory
+        .where({ branch_id: 1, product_id: id }).first();
+      if (!existingInv) {
+        await db.inventory.add({
+          branch_id: 1,
+          product_id: id,
+          quantity: 0,
+          last_updated: new Date().toISOString()
+        });
+      }
       
       // Queue for background sync
       await queueForSync('PRODUCT_ADD', { ...newProduct, id });
 
-      toast.success('Product added successfully (offline)');
+      toast.success('Product added successfully!');
       setShowAddModal(false);
       setFormData({ name: '', sku: '', barcode: '', category: '', price: '', tax_percent: '18', min_stock_level: '5' });
       loadProducts();
     } catch (error) {
-      toast.error('Failed to add product');
+      console.error('Product add error:', error);
+      toast.error(`Failed: ${error.message || 'Unknown error'}`);
     }
   };
 
