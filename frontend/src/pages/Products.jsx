@@ -143,8 +143,8 @@ export default function Products() {
       </div>
 
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[2000] flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-lg animate-slide-up overflow-hidden border border-border">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[2000] flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg animate-slide-up overflow-hidden border border-border my-auto">
             <div className="bg-primary p-4 text-white flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-black">Add New Product</h3>

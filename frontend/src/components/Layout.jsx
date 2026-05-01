@@ -139,7 +139,7 @@ export default function Layout({ children }) {
           style={{
             position: 'sticky', top: 0, zIndex: 50,
             padding: '0.5rem 2.5rem',
-            margin: '-2rem -2.5rem 2rem -2.5rem',
+            margin: '0 -2.5rem 2rem -2.5rem',
           }}
         >
           {/* Left: hamburger + page title */}
