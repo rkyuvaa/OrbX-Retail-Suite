@@ -1,15 +1,22 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Layout from './components/Layout';
 import POS from './pages/POS';
 import Products from './pages/Products';
+import Login from './pages/Login';
+import Setup from './pages/Setup';
 import { startSyncEngine, fetchUpdates } from './utils/db';
 
 // Mock Branch ID for testing
 const BRANCH_ID = 1;
 // Dynamically set API URL based on current host
 const API_URL = `http://${window.location.hostname}:5000`;
+
+function PrivateRoute({ children }) {
+  const isAuthenticated = !!localStorage.getItem('token');
+  return isAuthenticated ? <Layout>{children}</Layout> : <Navigate to="/login" />;
+}
 
 function Dashboard() {
   return (
@@ -87,18 +94,21 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/pos" element={<POS />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/inventory" element={<div className="card p-12 text-center text-muted">Inventory Module - Coming Soon</div>} />
-          <Route path="/transfers" element={<div className="card p-12 text-center text-muted">Transfers Module - Coming Soon</div>} />
-          <Route path="/customers" element={<div className="card p-12 text-center text-muted">Customers Module - Coming Soon</div>} />
-          <Route path="/reports" element={<div className="card p-12 text-center text-muted">Reports Module - Coming Soon</div>} />
-          <Route path="/settings" element={<div className="card p-12 text-center text-muted">Settings Module - Coming Soon</div>} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/setup" element={<Setup />} />
+        
+        {/* Protected Routes */}
+        <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/pos" element={<PrivateRoute><POS /></PrivateRoute>} />
+        <Route path="/products" element={<PrivateRoute><Products /></PrivateRoute>} />
+        <Route path="/inventory" element={<PrivateRoute><div className="card p-12 text-center text-muted">Inventory Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/transfers" element={<PrivateRoute><div className="card p-12 text-center text-muted">Transfers Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/customers" element={<PrivateRoute><div className="card p-12 text-center text-muted">Customers Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/reports" element={<PrivateRoute><div className="card p-12 text-center text-muted">Reports Module - Coming Soon</div></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute><div className="card p-12 text-center text-muted">Settings Module - Coming Soon</div></PrivateRoute>} />
+      </Routes>
+
       <Toaster position="bottom-right" toastOptions={{
         style: {
           background: 'var(--bg-card)',

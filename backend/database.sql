@@ -3,7 +3,8 @@
 -- Roles: Admin, Warehouse, Branch User
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL
+    name VARCHAR(50) UNIQUE NOT NULL,
+    permissions JSONB DEFAULT '{}'
 );
 
 -- Branches
@@ -23,6 +24,9 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL,
     role_id INTEGER REFERENCES roles(id),
     branch_id INTEGER REFERENCES branches(id),
+    allowed_branches JSONB DEFAULT '[]',
+    allowed_modules JSONB DEFAULT '[]',
+    is_superadmin BOOLEAN DEFAULT FALSE,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
