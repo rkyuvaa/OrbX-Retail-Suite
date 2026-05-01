@@ -63,6 +63,32 @@ const initDB = async () => {
         INSERT INTO roles (name) VALUES ('Admin') ON CONFLICT DO NOTHING;
         INSERT INTO roles (name) VALUES ('Warehouse') ON CONFLICT DO NOTHING;
         INSERT INTO roles (name) VALUES ('Branch User') ON CONFLICT DO NOTHING;
+
+        -- Ensure columns exist in existing tables
+        DO $$ 
+        BEGIN 
+            -- Users Table Updates
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='department_id') THEN
+                ALTER TABLE users ADD COLUMN department_id INTEGER REFERENCES departments(id);
+            END IF;
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='allowed_branches') THEN
+                ALTER TABLE users ADD COLUMN allowed_branches JSONB DEFAULT '[]';
+            END IF;
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='allowed_modules') THEN
+                ALTER TABLE users ADD COLUMN allowed_modules JSONB DEFAULT '{}';
+            END IF;
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='last_login') THEN
+                ALTER TABLE users ADD COLUMN last_login TIMESTAMP;
+            END IF;
+
+            -- Branches Table Updates
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='branches' AND column_name='address') THEN
+                ALTER TABLE branches ADD COLUMN address TEXT;
+            END IF;
+            IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='branches' AND column_name='is_active') THEN
+                ALTER TABLE branches ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
+            END IF;
+        END $$;
     `;
     try {
         await pool.query(schema);
